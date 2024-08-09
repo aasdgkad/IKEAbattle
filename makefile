@@ -9,7 +9,10 @@ INCLUDE_DIR = D:\ikeaBattle\SFML-2.6.1\include
 LIB_DIR = D:\ikeaBattle\SFML-2.6.1\lib
 
 # Source Files
-SRC = main.cpp
+SRC = main.cpp Player.cpp CutScene.cpp
+
+# Object Files
+OBJ = $(SRC:.cpp=.o)
 
 # Compiler Flags
 CXXFLAGS = -I$(INCLUDE_DIR) -DSFML_STATIC
@@ -21,15 +24,19 @@ LDFLAGS = -L$(LIB_DIR) -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lsfml-
 all: $(TARGET) run
 
 # Build the target
-$(TARGET): $(SRC)
-	$(CXX) $(SRC) -o $(TARGET) $(CXXFLAGS) $(LDFLAGS)
+$(TARGET): $(OBJ)
+	$(CXX) $(OBJ) -o $(TARGET) $(LDFLAGS)
+
+# Compile rule for .cpp files
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Run the executable after building
 run:
 	./$(TARGET).exe
 
-# Clean rule to remove the executable
+# Clean rule to remove the executable and object files
 clean:
-	del $(TARGET).exe
+	del $(TARGET).exe $(OBJ)
 
 .PHONY: all clean run
