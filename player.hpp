@@ -3,18 +3,16 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 class Map;
-class Player {
+class Player
+{
 public:
     Player(sf::Vector2f position);
-    void update(float deltaTime, const Map& map);
-    void draw(sf::RenderWindow& window);
+    void update(float deltaTime, const Map &map);
+    void draw(sf::RenderWindow &window);
     void handleInput();
-void updateState();
-    sf::FloatRect getBounds() const;
-    void handleCollision(const sf::FloatRect& objectBounds);
+    void updateState();
 
 private:
-
     sf::Sprite sprite;
     sf::Texture texture;
     sf::Vector2f velocity;
@@ -24,7 +22,12 @@ private:
     std::vector<sf::IntRect> idleFrames;
     std::vector<sf::IntRect> jumpingFrames;
 
-    enum class State { Idle, Running, Jumping };
+    enum class State
+    {
+        Idle,
+        Running,
+        Jumping
+    };
     State currentState;
 
     float gravity;
@@ -35,7 +38,7 @@ private:
     int currentFrame;
     float frameTime;
     float frameInterval;
-void checkCollisions(const std::vector<sf::FloatRect>& objectBounds);
+    void checkCollisions(const std::vector<sf::FloatRect> &objectBounds);
     void updateAnimation(float deltaTime);
     void loadTextures();
 };

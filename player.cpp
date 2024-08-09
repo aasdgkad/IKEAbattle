@@ -151,10 +151,6 @@ void Player::draw(sf::RenderWindow &window)
 {
        window.draw(sprite);
 }
-sf::FloatRect Player::getBounds() const
-{
-       return sprite.getGlobalBounds();
-}
 
 void Player::checkCollisions(const std::vector<sf::FloatRect> &objectBounds)
 {
