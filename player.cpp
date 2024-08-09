@@ -1,5 +1,5 @@
-// Player.cpp
-#include "Player.hpp"
+#include "libs.hpp"
+#include <iostream>
 
 Player::Player(sf::Vector2f position) : position(position), currentState(State::Idle), currentFrame(0), frameTime(0), frameInterval(0.1f), isFacingRight(true)
 {
@@ -37,7 +37,46 @@ void Player::loadTextures()
        }
 }
 
-void Player::update(float deltaTime)
+void Player::handleInput()
+{
+       if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+       {
+              velocity.x = -moveSpeed;
+              isFacingRight = false;
+       }
+       else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+       {
+              velocity.x = moveSpeed;
+              isFacingRight = true;
+       }
+       else
+       {
+              velocity.x = 0;
+       }
+
+       if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && isGrounded)
+       {
+              velocity.y = jumpForce;
+       }
+}
+
+void Player::updateState()
+{
+       if (!isGrounded)
+       {
+              currentState = State::Jumping;
+       }
+       else if (std::abs(velocity.x) > 0)
+       {
+              currentState = State::Running;
+       }
+       else
+       {
+              currentState = State::Idle;
+       }
+}
+
+void Player::update(float deltaTime, const Map &map)
 {
        handleInput();
 
@@ -46,64 +85,15 @@ void Player::update(float deltaTime)
 
        // Update position
        position += velocity * deltaTime;
+       sprite.setPosition(position);
+       // Check collisions with map objects
+       checkCollisions(map.getObjectBounds());
 
-       // Simple collision with window bottom
-       if (position.y > 768 - 64)
-       { // Assuming window height is 768
-              position.y = 768 - 64;
-              velocity.y = 0;
-              isGrounded = true;
-              if (currentState == State::Jumping)
-              {
-                     currentState = State::Idle;
-              }
-       }
-       else
-       {
-              isGrounded = false;
-       }
+       updateState();
 
        sprite.setPosition(position);
        updateAnimation(deltaTime);
 }
-
-void Player::handleInput()
-{
-       if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-       {
-              velocity.x = -moveSpeed;
-              isFacingRight = false;
-              if (isGrounded)
-              {
-                     currentState = State::Running;
-              }
-       }
-       else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-       {
-              velocity.x = moveSpeed;
-              isFacingRight = true;
-              if (isGrounded)
-              {
-                     currentState = State::Running;
-              }
-       }
-       else
-       {
-              velocity.x = 0;
-              if (currentState != State::Jumping)
-              {
-                     currentState = State::Idle;
-              }
-       }
-
-       if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && isGrounded)
-       {
-              velocity.y = jumpForce;
-              currentState = State::Jumping;
-              isGrounded = false;
-       }
-}
-
 void Player::updateAnimation(float deltaTime)
 {
        frameTime += deltaTime;
@@ -160,4 +150,54 @@ void Player::updateAnimation(float deltaTime)
 void Player::draw(sf::RenderWindow &window)
 {
        window.draw(sprite);
+}
+sf::FloatRect Player::getBounds() const
+{
+       return sprite.getGlobalBounds();
+}
+
+void Player::checkCollisions(const std::vector<sf::FloatRect> &objectBounds)
+{
+       sf::FloatRect playerBounds = sprite.getGlobalBounds();
+       isGrounded = false;
+       for (const auto &objBounds : objectBounds)
+       {
+              sf::FloatRect intersection;
+              if (playerBounds.intersects(objBounds, intersection))
+              {
+                     // Determine collision side
+                     if (intersection.width < intersection.height)
+                     {
+                            // Horizontal collision
+                            if (playerBounds.left < objBounds.left)
+                            {
+                                   position.x = objBounds.left - playerBounds.width;
+                            }
+                            else
+                            {
+                                   position.x = objBounds.left + objBounds.width;
+                            }
+                            velocity.x = 0;
+                     }
+                     else
+                     {
+                            // Vertical collision
+                            if (playerBounds.top < objBounds.top)
+                            {
+                                   if(velocity.y>0){
+                                          position.y = objBounds.top - playerBounds.height;
+                                   velocity.y = 0;
+                                   isGrounded = true;
+                                   }
+                            }
+                            else
+                            {
+                                   position.y = objBounds.top + objBounds.height;
+                                   velocity.y /= -2;
+                            }
+                     }
+                     sprite.setPosition(position);
+                     playerBounds = sprite.getGlobalBounds(); // Update bounds for next iteration
+              }
+       }
 }

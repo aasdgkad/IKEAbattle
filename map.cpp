@@ -74,3 +74,11 @@ Map::~Map()
         delete this->obj[i];
     }
 }
+
+std::vector<sf::FloatRect> Map::getObjectBounds() const {
+    std::vector<sf::FloatRect> bounds;
+    for (const auto& object : obj) {
+        bounds.push_back(object->rect.getGlobalBounds());
+    }
+    return bounds;
+}

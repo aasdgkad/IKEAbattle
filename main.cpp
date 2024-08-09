@@ -1,6 +1,7 @@
 
 #include "libs.hpp"
-
+class Player;
+class Map;
 int main() {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
     sf::RenderWindow window(sf::VideoMode(1024, 768), "SFML Player", sf::Style::Default);
@@ -11,7 +12,7 @@ int main() {
         "./imgs/player.png", "./imgs/2sleepHours.jpg", "./imgs/fun.jpg", "./imgs/haha.jpg"
     };
     CutScene cutScene(cutSceneImages, window.getSize());
-    Map hahaha("map.mib");
+    Map map("map.mib");
     Player player(sf::Vector2f(500, 384));
     sf::Clock clock;
 
@@ -25,14 +26,16 @@ int main() {
 
         float deltaTime = clock.restart().asSeconds();
 
-        if (!cutScene.cutSceneFinished) {
+        /*if (!cutScene.cutSceneFinished) {
             cutScene.cutSceneFinished = cutScene.update(deltaTime);
             window.clear(sf::Color::Black);
             cutScene.draw(window);
-        } else {
-            player.update(deltaTime);
+        } 
+        else*/
+         {
+            player.update(deltaTime, map);
             window.clear(sf::Color::White);
-            hahaha.draw(window);
+            map.draw(window);
             player.draw(window);
 
         }

@@ -1,4 +1,5 @@
 #pragma once
+class Player;
 
 class Map{
     private:
@@ -15,6 +16,7 @@ class Map{
     };
 
     public:
+    std::vector<sf::FloatRect> getObjectBounds() const;
     Map() = default;
     Map(std::string fname);//used to load the map from a file
     Map(const Map&) = delete;// Copy constructor is not needed
@@ -27,4 +29,5 @@ class Map{
 
     private:
     std::vector<Object*> obj;// A vector with pointers to the actual objects contained by the map
+
 };
