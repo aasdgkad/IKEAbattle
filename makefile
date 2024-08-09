@@ -9,7 +9,7 @@ INCLUDE_DIR = D:\ikeaBattle\SFML-2.6.1\include
 LIB_DIR = D:\ikeaBattle\SFML-2.6.1\lib
 
 # Source Files
-SRC = main.cpp Player.cpp CutScene.cpp
+SRC = main.cpp Player.cpp CutScene.cpp map.cpp
 
 # Object Files
 OBJ = $(SRC:.cpp=.o)

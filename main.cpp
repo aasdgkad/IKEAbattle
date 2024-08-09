@@ -1,7 +1,5 @@
-// main.cpp
-#include <SFML/Graphics.hpp>
-#include "Player.hpp"
-#include "CutScene.hpp"
+
+#include "libs.hpp"
 
 int main() {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
@@ -13,7 +11,7 @@ int main() {
         "./imgs/player.png", "./imgs/2sleepHours.jpg", "./imgs/fun.jpg", "./imgs/haha.jpg"
     };
     CutScene cutScene(cutSceneImages, window.getSize());
-
+    Map hahaha("map.mib");
     Player player(sf::Vector2f(500, 384));
     sf::Clock clock;
 
@@ -34,7 +32,9 @@ int main() {
         } else {
             player.update(deltaTime);
             window.clear(sf::Color::White);
+            hahaha.draw(window);
             player.draw(window);
+
         }
 
         window.display();
