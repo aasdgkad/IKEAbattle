@@ -1,0 +1,1 @@
+g++ maploader.cpp map.cpp player.cpp -o maploader -lsfml-graphics -lsfml-window -lsfml-system

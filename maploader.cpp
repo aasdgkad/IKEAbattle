@@ -2,9 +2,8 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(200, 200), "G");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Level Editor", sf::Style::Titlebar | sf::Style::Close);
+    Map map("map.mib");
 
     while (window.isOpen())
     {
@@ -13,10 +12,13 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            
         }
 
+        
+
         window.clear();
-        window.draw(shape);
+        map.draw(window);
         window.display();
     }
 
