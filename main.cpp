@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-
+#include <SFML/Config.hpp>
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(200, 200), "G");
