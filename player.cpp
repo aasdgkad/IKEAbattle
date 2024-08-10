@@ -21,19 +21,19 @@ void Player::loadTextures()
        // Set up running frames
        for (int i = 0; i < 4; ++i)
        {
-              idleFrames.push_back(sf::IntRect(i * 64, 0, 64, 64));
+              idleFrames.push_back(sf::IntRect(i * 29, 0, 29, 38));
        }
 
        // Set up idle frames
        for (int i = 0; i < 6; ++i)
        {
-              runningFrames.push_back(sf::IntRect(i * 64, 64, 64, 64));
+              runningFrames.push_back(sf::IntRect(i * 29, 38, 29, 38));
        }
 
        // Set up jumping frames
        for (int i = 0; i < 3; ++i)
        {
-              jumpingFrames.push_back(sf::IntRect(i * 64, 128, 64, 64));
+              jumpingFrames.push_back(sf::IntRect(i * 29, 76, 29, 38));
        }
 }
 

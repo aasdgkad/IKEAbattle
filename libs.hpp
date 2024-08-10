@@ -7,5 +7,6 @@
 #include <fstream>
 #include "Boss.hpp"
 #include "map.hpp"
+#include "Collidable.hpp"
 #include "player.hpp"
 #include "CutScene.hpp"

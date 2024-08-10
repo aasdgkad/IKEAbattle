@@ -1,7 +1,4 @@
-// Player.hpp
-#pragma once
-#include <SFML/Graphics.hpp>
-#include <vector>
+
 class Map;
 class Player
 {
