@@ -5,6 +5,7 @@ class Map;
 int main() {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
     sf::RenderWindow window(sf::VideoMode(1024, 768), "SFML Player", sf::Style::Default);
+    Boss boss("./imgs/oliverTree.png", window.getSize());
     window.setFramerateLimit(60);
 
     // Create the cut scene
@@ -33,9 +34,11 @@ int main() {
         } 
         else*/
          {
+             boss.update(deltaTime);
             player.update(deltaTime, map);
             window.clear(sf::Color::White);
             map.draw(window);
+            boss.draw(window);
             player.draw(window);
 
         }
