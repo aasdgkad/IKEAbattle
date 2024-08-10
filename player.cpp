@@ -197,3 +197,4 @@ void Player::checkCollisions(const std::vector<sf::FloatRect> &objectBounds)
               }
        }
 }
+//what am i doing idk i seem to be too incapable to code which is paradoxically is the only thing i know how to do (or not this is subjective) well that is unfortunate
