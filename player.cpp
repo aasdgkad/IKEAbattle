@@ -9,7 +9,7 @@ Player::Player(sf::Vector2f position) : position(position), currentState(State::
        sprite.setPosition(position);
 
        gravity = 980.0f;
-       jumpForce = -400.0f;
+       jumpForce = -500.0f;
        moveSpeed = 200.0f;
        velocity = sf::Vector2f(0, 0);
 }
@@ -76,7 +76,7 @@ void Player::updateState()
        }
 }
 
-void Player::update(float deltaTime, const Map &map)
+void Player::update(float deltaTime, Map &map, const sf::Vector2u& screenres)
 {
        handleInput();
 
@@ -88,6 +88,9 @@ void Player::update(float deltaTime, const Map &map)
        sprite.setPosition(position);
        // Check collisions with map objects
        checkCollisions(map.getObjectBounds());
+
+       //Check for part changes
+       checkBounds(screenres, map);    
 
        updateState();
 
@@ -196,5 +199,24 @@ void Player::checkCollisions(const std::vector<sf::FloatRect> &objectBounds)
                      playerBounds = sprite.getGlobalBounds(); // Update bounds for next iteration
               }
        }
+}
+
+void Player::checkBounds(const sf::Vector2u& screenres, Map& map){
+    if(this->position.x > screenres.x){
+        this->position.x = 0;
+        map.changePart(1,0);
+    }
+    else if(this->position.x < 0){
+        this->position.x = screenres.x - this->sprite.getGlobalBounds().width;
+        map.changePart(-1,0);
+    }
+    else if(this->position.y < 0){
+        this->position.y = screenres.y - this->sprite.getGlobalBounds().height;
+        map.changePart(0,-1);
+    }
+    else if(this->position.y > screenres.y){
+        this->position.y = 0;
+        map.changePart(0,1);
+    }
 }
 //what am i doing idk i seem to be too incapable to code which is paradoxically is the only thing i know how to do (or not this is subjective) well that is unfortunate

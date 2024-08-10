@@ -16,8 +16,8 @@ class Map{
     };
 
     public:
-    std::vector<sf::FloatRect> getObjectBounds() const;
-    Map() = default;
+    std::vector<sf::FloatRect> getObjectBounds();
+    Map();
     Map(std::string fname);//used to load the map from a file
     Map(const Map&) = delete;// Copy constructor is not needed
     Map& operator=(const Map&) = delete;// Copy assignment operator is not needed
@@ -26,8 +26,11 @@ class Map{
     void draw(sf::RenderWindow &window);// A function that draws the map
     void addObject(int x, int y, int w, int h, std::string tname);// A function that adds an object to the map
     void saveToFile(std::string fname);// A function that saves the map to a file (used by the level editor)
+    void changePart(int x, int y);// It changes the part relative to the current one
 
     private:
-    std::vector<Object*> obj;// A vector with pointers to the actual objects contained by the map
+    std::unordered_map<int, std::unordered_map<int, std::vector<Object*>>> obj;// It used to be a vector with pointers to the actual objects contained by the map
+    int mx,my,np;
+    //std::vector<Object*> obj;// A vector with pointers to the actual objects contained by the map
 
 };

@@ -1,0 +1,1 @@
+g++ leveleditor.cpp map.cpp -o leveleditor -lsfml-graphics -lsfml-window -lsfml-system

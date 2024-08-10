@@ -35,7 +35,7 @@ int main() {
         else*/
          {
              boss.update(deltaTime);
-            player.update(deltaTime, map);
+            player.update(deltaTime, map, window.getSize());
             window.clear(sf::Color::White);
             map.draw(window);
             boss.draw(window);

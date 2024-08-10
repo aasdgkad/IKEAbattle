@@ -7,7 +7,7 @@ class Player
 {
 public:
     Player(sf::Vector2f position);
-    void update(float deltaTime, const Map &map);
+    void update(float deltaTime, Map &map, const sf::Vector2u& screenres);
     void draw(sf::RenderWindow &window);
     void handleInput();
     void updateState();
@@ -39,6 +39,7 @@ private:
     float frameTime;
     float frameInterval;
     void checkCollisions(const std::vector<sf::FloatRect> &objectBounds);
+    void checkBounds(const sf::Vector2u& screenres, Map& map);
     void updateAnimation(float deltaTime);
     void loadTextures();
 };
