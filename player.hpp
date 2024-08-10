@@ -1,41 +1,21 @@
+#pragma once
+class Animation;
 
-class Map;
-class Player
-{
+class Player : public Entity {
 public:
     Player(sf::Vector2f position);
-    void update(float deltaTime, const Map &map);
-    void draw(sf::RenderWindow &window);
-    void handleInput();
-    void updateState();
+    void update(float deltaTime, Map& map, const sf::Vector2u& screenres) override;
+    void draw(sf::RenderWindow& window) override;
 
 private:
-    sf::Sprite sprite;
-    sf::Texture texture;
-    sf::Vector2f velocity;
-    sf::Vector2f position;
-
-    std::vector<sf::IntRect> runningFrames;
-    std::vector<sf::IntRect> idleFrames;
-    std::vector<sf::IntRect> jumpingFrames;
-
-    enum class State
-    {
-        Idle,
-        Running,
-        Jumping
-    };
-    State currentState;
+    void handleInput();
+    void updateAnimation();
+    void manageCollisions(const std::vector<sf::FloatRect>& objectBounds);
+    void checkBounds(const sf::Vector2u& screenres, Map& map);
 
     float gravity;
     float jumpForce;
     float moveSpeed;
     bool isGrounded;
-    bool isFacingRight;
-    int currentFrame;
-    float frameTime;
-    float frameInterval;
-    void checkCollisions(const std::vector<sf::FloatRect> &objectBounds);
-    void updateAnimation(float deltaTime);
-    void loadTextures();
+    void loadAnimations();
 };

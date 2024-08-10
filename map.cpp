@@ -12,7 +12,7 @@ Map::Object::Object(int x, int y, int w, int h, std::string tname) : rect(sf::Ve
     this->rect.setPosition(x, y);
 
     // Setting the texture ID by removing the suffix .png and turning what is left to a number
-    tname.erase(tname.length()-4);
+    tname.erase(tname.length() - 4);
     this->texid = std::stoi(tname);
 }
 
@@ -21,64 +21,111 @@ void Map::Object::draw(sf::RenderWindow &window)
     window.draw(rect);
 }
 
-Map::Map(std::string fname)
+Map::Map() : mx(0), my(0), np(1)
+{
+}
+
+Map::Map(std::string fname) : mx(0), my(0)
 {
     std::ifstream file(fname, std::ios::binary);
     int size;
-    file.read((char*)&size, sizeof(int));
-    for(int i = 0; i < size; i++){
-        int cx,cy,cw,ch,tid;
-        file.read((char*)&cx, sizeof(int));
-        file.read((char*)&cy, sizeof(int));
-        file.read((char*)&cw, sizeof(int));
-        file.read((char*)&ch, sizeof(int));
-        file.read((char*)&tid, sizeof(int));
+    file.read((char *)&size, sizeof(int));
+    this->np = size;
+    for (int j = 0; j < size; j++)
+    {
+        int cmx, cmy, ssize;
+        file.read((char *)&cmx, sizeof(int));
+        file.read((char *)&cmy, sizeof(int));
+        file.read((char *)&ssize, sizeof(int));
+        for (int i = 0; i < ssize; i++)
+        {
+            int cx, cy, cw, ch, tid;
+            file.read((char *)&cx, sizeof(int));
+            file.read((char *)&cy, sizeof(int));
+            file.read((char *)&cw, sizeof(int));
+            file.read((char *)&ch, sizeof(int));
+            file.read((char *)&tid, sizeof(int));
 
-        this->obj.push_back(new Object(cx,cy,cw,ch, std::to_string(tid) + ".png"));
+            this->obj[cmx][cmy].push_back(new Object(cx, cy, cw, ch, std::to_string(tid) + ".png"));
+        }
     }
 }
 
 void Map::draw(sf::RenderWindow &window)
 {
-    for (int i = 0; i < this->obj.size(); i++)
+    for (int i = 0; i < this->obj[mx][my].size(); i++)
     {
-        obj[i]->draw(window);
+        obj[mx][my][i]->draw(window);
     }
 }
 
-void Map::addObject(int x, int y, int w, int h, std::string tname){
-    this->obj.push_back(new Object(x,y,w,h,tname));
+void Map::addObject(int x, int y, int w, int h, std::string tname)
+{
+    this->obj[mx][my].push_back(new Object(x, y, w, h, tname));
 }
 
-void Map::saveToFile(std::string fname){
+void Map::saveToFile(std::string fname)
+{
+    if (std::filesystem::exists(fname)) {
+        // Remove the file
+        std::filesystem::remove(fname);
+    }
     std::ofstream file(fname, std::ios::binary | std::ios::app);
-    int size = this->obj.size();
-    file.write((char*)&size, sizeof(int));
-    for(int i = 0; i < this->obj.size(); i++){
-        // The only reason I am doing this btw is because sf::RectangleShape returns floats when my object uses integers ;)
-        int cx = this->obj[i]->rect.getPosition().x;
-        int cy = this->obj[i]->rect.getPosition().y;
-        int cw = this->obj[i]->rect.getSize().x;
-        int ch = this->obj[i]->rect.getSize().y;
-        file.write((char*)&cx, sizeof(int));
-        file.write((char*)&cy, sizeof(int));
-        file.write((char*)&cw, sizeof(int));
-        file.write((char*)&ch, sizeof(int));
-        file.write((char*)&this->obj[i]->texid, sizeof(unsigned int));
+    int size = this->np;
+    file.write((char *)&size, sizeof(int));
+    for (const auto &x : this->obj)
+    {
+        for (const auto &y : x.second)
+        {
+            int ssize = y.second.size();
+            file.write((char *)&x.first, sizeof(int));
+            file.write((char *)&y.first, sizeof(int));
+            file.write((char *)&ssize, sizeof(int));
+            for (int i = 0; i < ssize; i++)
+            {
+                // The only reason I am doing this btw is because sf::RectangleShape returns floats when my object uses integers ;)
+                int cx = this->obj[x.first][y.first][i]->rect.getPosition().x;
+                int cy = this->obj[x.first][y.first][i]->rect.getPosition().y;
+                int cw = this->obj[x.first][y.first][i]->rect.getSize().x;
+                int ch = this->obj[x.first][y.first][i]->rect.getSize().y;
+                file.write((char *)&cx, sizeof(int));
+                file.write((char *)&cy, sizeof(int));
+                file.write((char *)&cw, sizeof(int));
+                file.write((char *)&ch, sizeof(int));
+                file.write((char *)&this->obj[x.first][y.first][i]->texid, sizeof(unsigned int));
+            }
+        }
     }
+}
+
+void Map::changePart(int x, int y)
+{
+    this->mx += x;
+    this->my += y;
+    if (this->obj[mx][my].size() == 0)
+        np++;
 }
 
 Map::~Map()
 {
-    for(int i = 0; i < this->obj.size(); i++){
-        delete this->obj[i];
+    for (const auto &x : this->obj)
+    {
+        for (const auto &y : x.second)
+        {
+            for (int i = 0; i < y.second.size(); i++)
+            {
+                delete y.second[i];
+            }
+        }
     }
 }
 
-std::vector<sf::FloatRect> Map::getObjectBounds() const {
+std::vector<sf::FloatRect> Map::getObjectBounds()
+{
     std::vector<sf::FloatRect> bounds;
-    for (const auto& object : obj) {
-        bounds.push_back(object->rect.getGlobalBounds());
+    for (int i = 0; i < obj[mx][my].size(); i++)
+    {
+        bounds.push_back(this->obj[mx][my][i]->rect.getGlobalBounds());
     }
     return bounds;
 }

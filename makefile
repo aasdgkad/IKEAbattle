@@ -1,5 +1,5 @@
 # Compiler
-CXX = g++
+CXX = g++ -g
 
 # Project Name
 TARGET = ikea
@@ -9,7 +9,7 @@ INCLUDE_DIR = D:\ikeaBattle\SFML-2.6.1\include
 LIB_DIR = D:\ikeaBattle\SFML-2.6.1\lib
 
 # Source Files
-SRC = main.cpp Player.cpp CutScene.cpp map.cpp Boss.cpp Collidable.cpp
+SRC = main.cpp player.cpp CutScene.cpp map.cpp Boss.cpp Animation.cpp CollisionDetector.cpp Entity.cpp
 
 # Object Files
 OBJ = $(SRC:.cpp=.o)

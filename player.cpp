@@ -1,40 +1,23 @@
 #include "libs.hpp"
 #include <iostream>
 
-Player::Player(sf::Vector2f position) : position(position), currentState(State::Idle), currentFrame(0), frameTime(0), frameInterval(0.1f), isFacingRight(true)
-{
-       loadTextures();
-       sprite.setTexture(texture);
-       sprite.setTextureRect(idleFrames[0]);
-       sprite.setPosition(position);
+Player::Player(sf::Vector2f position) : Entity() {
+    loadAnimations();
+    setPosition(position);
 
-       gravity = 980.0f;
-       jumpForce = -400.0f;
-       moveSpeed = 200.0f;
-       velocity = sf::Vector2f(0, 0);
+    gravity = 980.0f;
+    jumpForce = -700.0f;
+    moveSpeed = 200.0f;
+    isGrounded = false;
 }
 
-void Player::loadTextures()
+void Player::loadAnimations()
 {
-       texture.loadFromFile("./imgs/player.png");
-
-       // Set up running frames
-       for (int i = 0; i < 4; ++i)
-       {
-              idleFrames.push_back(sf::IntRect(i * 29, 0, 29, 38));
-       }
-
-       // Set up idle frames
-       for (int i = 0; i < 6; ++i)
-       {
-              runningFrames.push_back(sf::IntRect(i * 29, 38, 29, 38));
-       }
-
-       // Set up jumping frames
-       for (int i = 0; i < 3; ++i)
-       {
-              jumpingFrames.push_back(sf::IntRect(i * 29, 76, 29, 38));
-       }
+       loadSpritesheet("./imgs/player.png", 29, 38);
+       addAnimation("idle", 0, 4);
+       addAnimation("running", 1, 6);
+       addAnimation("jumping", 2, 3);
+       setAnimation("idle");
 }
 
 void Player::handleInput()
@@ -60,91 +43,47 @@ void Player::handleInput()
        }
 }
 
-void Player::updateState()
+void Player::updateAnimation()
 {
        if (!isGrounded)
        {
-              currentState = State::Jumping;
+              pause();
+              setAnimation("jumping");
+              if (velocity.y < 0) // Rising
+              {
+                     setCurrentFrame(0);
+              }
+              else if (std::abs(velocity.y) < 200) // Near apex
+              {
+                     setCurrentFrame(1);
+              }
+              else // Falling
+              {
+                     setCurrentFrame(2);
+              }
        }
        else if (std::abs(velocity.x) > 0)
        {
-              currentState = State::Running;
+              resume();
+              setAnimation("running");
        }
        else
        {
-              currentState = State::Idle;
+              resume();
+              setAnimation("idle");
        }
 }
 
-void Player::update(float deltaTime, const Map &map)
+void Player::update(float deltaTime, Map &map, const sf::Vector2u &screenres)
 {
        handleInput();
-
-       // Apply gravity
        velocity.y += gravity * deltaTime;
-
-       // Update position
        position += velocity * deltaTime;
-       sprite.setPosition(position);
-       // Check collisions with map objects
-       checkCollisions(map.getObjectBounds());
-
-       updateState();
-
-       sprite.setPosition(position);
-       updateAnimation(deltaTime);
-}
-void Player::updateAnimation(float deltaTime)
-{
-       frameTime += deltaTime;
-       if (frameTime >= frameInterval)
-       {
-              frameTime = 0;
-
-              std::vector<sf::IntRect> *currentAnimation;
-              switch (currentState)
-              {
-              case State::Running:
-                     currentAnimation = &runningFrames;
-                     currentFrame++;
-                     if (currentFrame >= currentAnimation->size())
-                     {
-                            currentFrame = 0;
-                     }
-                     break;
-              case State::Jumping:
-                     currentAnimation = &jumpingFrames;
-                     // Jumping animation logic
-                     if (velocity.y < 0) // Rising
-                     {
-                            currentFrame = 0;
-                     }
-                     else if (velocity.y >= -200 && velocity.y < 200) // Near apex
-                     {
-                            currentFrame = 1;
-                     }
-                     else // Falling
-                     {
-                            currentFrame = 2;
-                     }
-                     break;
-              default:
-                     currentAnimation = &idleFrames;
-                     currentFrame++;
-                     if (currentFrame >= currentAnimation->size())
-                     {
-                            currentFrame = 0;
-                     }
-              }
-
-              sf::IntRect currentRect = (*currentAnimation)[currentFrame];
-              if (!isFacingRight)
-              {
-                     currentRect.left = currentRect.left + currentRect.width;
-                     currentRect.width = -currentRect.width;
-              }
-              sprite.setTextureRect(currentRect);
-       }
+       getSprite().setPosition(position);
+       manageCollisions(map.getObjectBounds());
+       checkBounds(screenres, map);
+       updateAnimation();
+       Animation::update(deltaTime);
 }
 
 void Player::draw(sf::RenderWindow &window)
@@ -152,49 +91,59 @@ void Player::draw(sf::RenderWindow &window)
        window.draw(sprite);
 }
 
-void Player::checkCollisions(const std::vector<sf::FloatRect> &objectBounds)
+void Player::manageCollisions(const std::vector<sf::FloatRect>& objectBounds) {
+    sf::FloatRect playerBounds = getSprite().getGlobalBounds();
+    isGrounded = false;
+
+    for (const auto& obstacle : objectBounds) {
+        CollisionInfo collision = checkCollision(playerBounds, {obstacle});
+        if (collision.collided) {
+            switch (collision.side) {
+                case CollisionSide::Left:
+                    position.x = obstacle.left - playerBounds.width;
+                    velocity.x = 0;
+                    break;
+                case CollisionSide::Right:
+                    position.x = obstacle.left + obstacle.width;
+                    velocity.x = 0;
+                    break;
+                case CollisionSide::Top:
+                    position.y = obstacle.top - playerBounds.height;
+                    velocity.y = 0;
+                    isGrounded = true;
+                    break;
+                case CollisionSide::Bottom:
+                    position.y = obstacle.top + obstacle.height;
+                    velocity.y = 0;
+                    break;
+                default:
+                    break;
+            }
+            setPosition(position);
+        }
+    }
+}
+void Player::checkBounds(const sf::Vector2u &screenres, Map &map)
 {
-       sf::FloatRect playerBounds = sprite.getGlobalBounds();
-       isGrounded = false;
-       for (const auto &objBounds : objectBounds)
+       if (this->position.x > screenres.x)
        {
-              sf::FloatRect intersection;
-              if (playerBounds.intersects(objBounds, intersection))
-              {
-                     // Determine collision side
-                     if (intersection.width < intersection.height)
-                     {
-                            // Horizontal collision
-                            if (playerBounds.left < objBounds.left)
-                            {
-                                   position.x = objBounds.left - playerBounds.width;
-                            }
-                            else
-                            {
-                                   position.x = objBounds.left + objBounds.width;
-                            }
-                            velocity.x = 0;
-                     }
-                     else
-                     {
-                            // Vertical collision
-                            if (playerBounds.top < objBounds.top)
-                            {
-                                   if(velocity.y>0){
-                                          position.y = objBounds.top - playerBounds.height;
-                                   velocity.y = 0;
-                                   isGrounded = true;
-                                   }
-                            }
-                            else
-                            {
-                                   position.y = objBounds.top + objBounds.height;
-                                   velocity.y /= -2;
-                            }
-                     }
-                     sprite.setPosition(position);
-                     playerBounds = sprite.getGlobalBounds(); // Update bounds for next iteration
-              }
+              this->position.x = 0;
+              map.changePart(1, 0);
+       }
+       else if (this->position.x < 0)
+       {
+              this->position.x = screenres.x - this->sprite.getGlobalBounds().width;
+              map.changePart(-1, 0);
+       }
+       else if (this->position.y < 0)
+       {
+              this->position.y = screenres.y - this->sprite.getGlobalBounds().height;
+              map.changePart(0, -1);
+       }
+       else if (this->position.y > screenres.y)
+       {
+              this->position.y = 0;
+              map.changePart(0, 1);
        }
 }
-//what am i doing idk i seem to be too incapable to code which is paradoxically is the only thing i know how to do (or not this is subjective) well that is unfortunate
+// what am i doing idk i seem to be too incapable to code which is paradoxically is the only thing i know how to do (or not this is subjective) well that is unfortunate

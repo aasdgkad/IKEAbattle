@@ -2,16 +2,17 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Level Editor", sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(1024, 768), "Level Editor", sf::Style::Titlebar | sf::Style::Close);
     Map map;
 
-    sf::View view(sf::FloatRect(0,0,800,600));
+    sf::View view(sf::FloatRect(0,0,window.getSize().x,window.getSize().y));
     sf::Texture rectex;
     sf::RectangleShape transrect;// This is the transparent placeholder rectangle 
     sf::Vector2i fc(0,0), sc(0,0), ap(0,0), mp(0,0);// Stands for first click, second click, anchor point, magical potion ;)
     int xoff = 0, yoff = 0;// The x and y offsets that are used by the right click movement
     float wscale = 1.0f;// The wheel scale factor
     bool rc = 0, lc = 0;// Stands for right click, left click, used to determine if the left or right click are currently being pressed
+    
 
     window.setView(view);
     rectex.loadFromFile("0.png");
@@ -33,6 +34,9 @@ int main()
                 if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
                     // Adjusting the scale
                     wscale -= event.mouseWheelScroll.delta/50.0f;
+                    if(wscale > 1.0f){
+                        wscale = 1.0f;
+                    }
                 }
             }
         }
@@ -51,6 +55,7 @@ int main()
             map.addObject(std::min(sc.x, fc.x), std::min(sc.y, fc.y), std::abs(sc.x-fc.x), std::abs(sc.y-fc.y), "0.png");
             fc = sf::Vector2i(0,0);
             sc = sf::Vector2i(0,0);
+            transrect.setSize(sf::Vector2f(0,0));
             lc = 0;
         }
 
@@ -74,7 +79,7 @@ int main()
             // While the right click is being pressed adjust the view accordingly
             else if(rc){
                 mp = sf::Mouse::getPosition();
-                view.setCenter(400 + xoff + ap.x - mp.x, 300 + yoff + ap.y - mp.y);
+                view.setCenter(window.getSize().x/2 + xoff + ap.x - mp.x, window.getSize().y/2 + yoff + ap.y - mp.y);
                 window.setView(view);
             }
         }
@@ -90,13 +95,33 @@ int main()
             while(sf::Keyboard::isKeyPressed(sf::Keyboard::S));
         }
 
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
+            map.changePart(-1,0);
+            while(sf::Keyboard::isKeyPressed(sf::Keyboard::Left));
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)){
+            map.changePart(1,0);
+            while(sf::Keyboard::isKeyPressed(sf::Keyboard::Right));
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)){
+            map.changePart(0,-1);
+            while(sf::Keyboard::isKeyPressed(sf::Keyboard::Up));
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)){
+            map.changePart(0,1);
+            while(sf::Keyboard::isKeyPressed(sf::Keyboard::Down));
+        }
+
         // Scaling the view
-        view.setSize(800*wscale, 600*wscale);
+        view.setSize(window.getSize().x*wscale, window.getSize().y*wscale);
         window.setView(view);
 
         window.clear();
-        map.draw(window);
         window.draw(transrect);
+        map.draw(window);
         window.display();
     }
 
