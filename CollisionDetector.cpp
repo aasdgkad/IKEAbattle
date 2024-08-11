@@ -22,5 +22,6 @@ CollisionDetector::CollisionSide CollisionDetector::getCollisionSide(const sf::F
     if (minOverlap == leftOverlap) return CollisionSide::Left;
     if (minOverlap == rightOverlap) return CollisionSide::Right;
     if (minOverlap == topOverlap) return CollisionSide::Top;
-    return CollisionSide::Bottom;
+    if (minOverlap == bottomOverlap) return CollisionSide::Bottom;
+    return CollisionSide::None;
 }

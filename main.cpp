@@ -16,7 +16,7 @@ int main() {
     Map map("map.mib");
     Player player(sf::Vector2f(500, 384));
     sf::Clock clock;
-
+Idk wtf(sf::Vector2f(300, 300), 200);
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -35,10 +35,12 @@ int main() {
         else*/
          {
              boss.update(deltaTime);
+             wtf.update(deltaTime, map,window.getSize());
             player.update(deltaTime, map,window.getSize());
             window.clear(sf::Color::White);
             map.draw(window);
             boss.draw(window);
+            wtf.draw(window);
             player.draw(window);
 
         }
