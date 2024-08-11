@@ -41,6 +41,11 @@ void Idk::draw(sf::RenderWindow& window)
 {
     window.draw(getSprite());
 }
+bool Idk::isOutOfBounds(const sf::Vector2u& windowSize) const
+{
+    sf::FloatRect bounds = sprite.getGlobalBounds();
+    return bounds.top > windowSize.y || bounds.left + bounds.width < 0 || bounds.left > windowSize.x;
+}
 
 void Idk::manageCollisions(const std::vector<sf::FloatRect>& objectBounds)
 {

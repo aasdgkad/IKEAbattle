@@ -9,9 +9,9 @@
 #include <fstream>
 #include "map.hpp"
 #include "CutScene.hpp"
-#include "Boss.hpp"
 #include "Animation.hpp"
 #include "CollisionDetector.hpp"
 #include "Entity.hpp"
 #include "player.hpp"
 #include "idk.hpp"
+#include "Boss.hpp"

@@ -13,7 +13,7 @@ int main() {
         "./imgs/player.png", "./imgs/2sleepHours.jpg", "./imgs/fun.jpg", "./imgs/haha.jpg"
     };
     CutScene cutScene(cutSceneImages, window.getSize());
-    Map map("map.mib");
+    Map map("map.mib", window);
     Player player(sf::Vector2f(500, 384));
     sf::Clock clock;
 Idk wtf(sf::Vector2f(300, 300), 200);
@@ -34,11 +34,11 @@ Idk wtf(sf::Vector2f(300, 300), 200);
         } 
         else*/
          {
-             boss.update(deltaTime);
+             boss.update(deltaTime, map);
              wtf.update(deltaTime, map,window.getSize());
             player.update(deltaTime, map,window.getSize());
             window.clear(sf::Color::White);
-            map.draw(window);
+            map.draw();
             boss.draw(window);
             wtf.draw(window);
             player.draw(window);
