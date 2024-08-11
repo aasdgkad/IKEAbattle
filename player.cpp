@@ -123,27 +123,20 @@ void Player::manageCollisions(const std::vector<sf::FloatRect>& objectBounds) {
         }
     }
 }
-void Player::checkBounds(const sf::Vector2u &screenres, Map &map)
-{
-       if (this->position.x > screenres.x)
-       {
-              this->position.x = 0;
-              map.changePart(1, 0);
-       }
-       else if (this->position.x < 0)
-       {
-              this->position.x = screenres.x - this->sprite.getGlobalBounds().width;
-              map.changePart(-1, 0);
-       }
-       else if (this->position.y < 0)
-       {
-              this->position.y = screenres.y - this->sprite.getGlobalBounds().height;
-              map.changePart(0, -1);
-       }
-       else if (this->position.y > screenres.y)
-       {
-              this->position.y = 0;
-              map.changePart(0, 1);
-       }
+
+void Player::checkBounds(const sf::Vector2u& screenres, Map& map){
+    auto bounds = map.getPartBounds();
+    if(this->position.x > bounds.left + bounds.width){
+        map.changePart(1,0);
+    }
+    else if(this->position.x < bounds.left){
+        map.changePart(-1,0);
+    }
+    else if(this->position.y < bounds.top){
+        map.changePart(0,-1);
+    }
+    else if(this->position.y > bounds.top + bounds.height){
+        map.changePart(0,1);
+    }
 }
 // what am i doing idk i seem to be too incapable to code which is paradoxically is the only thing i know how to do (or not this is subjective) well that is unfortunate
