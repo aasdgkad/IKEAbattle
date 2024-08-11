@@ -1,9 +1,8 @@
-// Boss.cpp
-#include "Boss.hpp"
+#include "libs.hpp"
 #include <iostream>
 
 Boss::Boss(const std::string& imagePath, sf::Vector2u windowSize)
-    : targetWidth(400.0f), windowSize(windowSize), bounceSpeed(200.0f)
+    : targetWidth(400.0f), windowSize(windowSize), bounceSpeed(200.0f), spawnTimer(0.0f)
 {
     loadAndScaleImage(imagePath);
     setInitialPosition();
@@ -32,7 +31,7 @@ void Boss::setInitialPosition()
     sprite.setPosition(x, y);
 }
 
-void Boss::update(float deltaTime)
+void Boss::update(float deltaTime, Map& map)
 {
     sf::Vector2f position = sprite.getPosition();
 
@@ -45,9 +44,39 @@ void Boss::update(float deltaTime)
     }
 
     sprite.setPosition(position);
+
+    // Spawn Idk objects
+    spawnTimer += deltaTime;
+    if (spawnTimer >= 2.0f) {  // Spawn every 2 seconds
+        spawnIdk();
+        spawnTimer = 0.0f;  // Reset the timer
+    }
+
+    // Update all Idk objects
+    for (auto it = idkObjects.begin(); it != idkObjects.end();) {
+        (*it)->update(deltaTime, map, windowSize);
+        if ((*it)->isOutOfBounds(windowSize)) {
+            it = idkObjects.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 void Boss::draw(sf::RenderWindow& window)
 {
     window.draw(sprite);
+    
+    // Draw all Idk objects
+    for (const auto& idk : idkObjects) {
+        idk->draw(window);
+    }
+}
+
+void Boss::spawnIdk()
+{
+    sf::Vector2f spawnPosition = sprite.getPosition();
+    spawnPosition.y += sprite.getGlobalBounds().height;  // Spawn below the boss
+    float moveDistance = 200.0f;
+    idkObjects.push_back(std::make_unique<Idk>(spawnPosition, moveDistance));
 }

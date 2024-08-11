@@ -34,7 +34,7 @@ Idk wtf(sf::Vector2f(300, 300), 200);
         } 
         else*/
          {
-             boss.update(deltaTime);
+             boss.update(deltaTime, map);
              wtf.update(deltaTime, map,window.getSize());
             player.update(deltaTime, map,window.getSize());
             window.clear(sf::Color::White);
