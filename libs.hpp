@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <string>
+#include <math.h>
+#include <cstdlib>
 #include <vector>
 #include <unordered_map>
 #include <cassert>
@@ -14,4 +16,5 @@
 #include "Entity.hpp"
 #include "player.hpp"
 #include "idk.hpp"
+#include "attack.hpp"
 #include "Boss.hpp"

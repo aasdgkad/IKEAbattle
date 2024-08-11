@@ -34,10 +34,10 @@ Idk wtf(sf::Vector2f(300, 300), 200);
         } 
         else*/
          {
-             boss.update(deltaTime, map);
+             boss.update(deltaTime, map, player.getBounds());
              wtf.update(deltaTime, map,window.getSize());
             player.update(deltaTime, map,window.getSize());
-            window.clear(sf::Color::White);
+            window.clear(sf::Color::Black);
             map.draw();
             boss.draw(window);
             wtf.draw(window);

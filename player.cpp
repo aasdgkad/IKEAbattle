@@ -139,4 +139,8 @@ void Player::checkBounds(const sf::Vector2u& screenres, Map& map){
         map.changePart(0,1);
     }
 }
+
+sf::FloatRect Player::getBounds(){
+    return this->sprite.getGlobalBounds();
+}
 // what am i doing idk i seem to be too incapable to code which is paradoxically is the only thing i know how to do (or not this is subjective) well that is unfortunate

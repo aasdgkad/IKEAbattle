@@ -5,6 +5,7 @@ class Player : public Entity {
 public:
     Player(sf::Vector2f position);
     void update(float deltaTime, Map& map, const sf::Vector2u& screenres) override;
+    sf::FloatRect getBounds();
     void draw(sf::RenderWindow& window) override;
 
 private:

@@ -7,6 +7,7 @@ Boss::Boss(const std::string& imagePath, sf::Vector2u windowSize)
     loadAndScaleImage(imagePath);
     setInitialPosition();
     velocity = sf::Vector2f(bounceSpeed, 0);
+    atimer.restart();
 }
 
 void Boss::loadAndScaleImage(const std::string& imagePath)
@@ -31,7 +32,7 @@ void Boss::setInitialPosition()
     sprite.setPosition(x, y);
 }
 
-void Boss::update(float deltaTime, Map& map)
+void Boss::update(float deltaTime, Map& map, sf::FloatRect player)
 {
     sf::Vector2f position = sprite.getPosition();
 
@@ -61,6 +62,20 @@ void Boss::update(float deltaTime, Map& map)
             ++it;
         }
     }
+
+    // Create Attacks
+    sf::Vector2f vdis = player.getPosition() + player.getSize()/2.0f - this->sprite.getPosition();
+    float distance = sqrt(vdis.x*vdis.x + vdis.y*vdis.y);
+
+    if(atimer.getElapsedTime().asSeconds() >= 0.5){
+        this->attacks.push_back(new HammerThrow(this->sprite.getPosition()));
+        atimer.restart();
+    }
+    
+
+    for(const auto& att : this->attacks){
+        att->update(player);
+    }
 }
 
 void Boss::draw(sf::RenderWindow& window)
@@ -71,6 +86,11 @@ void Boss::draw(sf::RenderWindow& window)
     for (const auto& idk : idkObjects) {
         idk->draw(window);
     }
+
+    // Draw all attacks
+    for(const auto& at : attacks){
+        at->draw(window);
+    }
 }
 
 void Boss::spawnIdk()
@@ -79,4 +99,10 @@ void Boss::spawnIdk()
     spawnPosition.y += sprite.getGlobalBounds().height;  // Spawn below the boss
     float moveDistance = 200.0f;
     idkObjects.push_back(std::make_unique<Idk>(spawnPosition, moveDistance));
+}
+
+Boss::~Boss(){
+    for(int i = 0; i < this->attacks.size(); i++){
+        delete attacks[i];
+    }
 }
