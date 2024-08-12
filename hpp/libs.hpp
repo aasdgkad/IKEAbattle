@@ -1,0 +1,21 @@
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <string>
+#include <math.h>
+#include <cstdlib>
+#include <vector>
+#include <unordered_map>
+#include <cassert>
+#include <filesystem>
+#include <iostream>//only used for debugging can be removed
+#include <fstream>
+#include "map.hpp"
+#include "CutScene.hpp"
+#include "Animation.hpp"
+#include "CollisionDetector.hpp"
+#include "Entity.hpp"
+#include "idk.hpp"
+#include "attack.hpp"
+#include "Boss.hpp"
+#include "PacMan.hpp"
+#include "player.hpp"
