@@ -42,3 +42,36 @@ class Plank : public Attack{
     sf::Clock timer;
     bool fc;
 };
+
+class LaserBeam : public Attack{
+    public:
+    LaserBeam(sf::Vector2f sp, float rotangle);
+
+    bool update(sf::FloatRect player) override;
+
+    void draw(sf::RenderWindow& window) override;
+
+    private:
+    sf::Texture texture;
+    sf::Sprite sprite;
+    sf::Vector2f velocity;
+    sf::Clock timer;
+    bool fc;
+};
+
+class TableFall : public Attack{
+    public:
+    TableFall(sf::Vector2f sp);
+
+    bool update(sf::FloatRect player) override;
+
+    void draw(sf::RenderWindow& window) override;
+
+    private:
+    sf::Texture texture;
+    sf::Sprite sprite;
+    sf::Vector2f velocity;
+    sf::Clock timer;
+    bool fc;
+};
+

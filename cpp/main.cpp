@@ -17,7 +17,7 @@ int main() {
     Player player(sf::Vector2f(500, 384));
     sf::Clock clock;
     PacMan* twoPac = new PacMan(sf::Vector2f(-107, 384));
-Idk wtf(sf::Vector2f(300, 300), 200);
+    Idk wtf(sf::Vector2f(300, 300), 200);
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {

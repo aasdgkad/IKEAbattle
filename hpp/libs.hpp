@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <iostream>//only used for debugging can be removed
 #include <fstream>
+#include <random>
 #include "map.hpp"
 #include "CutScene.hpp"
 #include "Animation.hpp"

@@ -9,7 +9,9 @@ public:
 
 private:
     sf::Texture texture;
+    sf::Texture eyetexture;
     sf::Sprite sprite;
+    sf::Sprite eyesprite;
     sf::Vector2f velocity;
     float bounceSpeed;
     float targetWidth;
@@ -18,7 +20,9 @@ private:
     std::vector<std::unique_ptr<Idk>> idkObjects;
     std::vector<Attack*> attacks;
     sf::Clock atimer;
-     sf::Clock ptimer;
+    sf::Clock ptimer;
+    sf::Clock ltimer;
+    sf::Clock ttimer;
 
     void loadAndScaleImage(const std::string& imagePath);
     void setInitialPosition();

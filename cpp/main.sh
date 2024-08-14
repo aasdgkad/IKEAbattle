@@ -1,0 +1,1 @@
+g++ main.cpp player.cpp CutScene.cpp map.cpp Boss.cpp Entity.cpp Animation.cpp idk.cpp CollisionDetector.cpp attack.cpp PacMan.cpp -o main -lsfml-graphics -lsfml-window -lsfml-system

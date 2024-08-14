@@ -9,23 +9,12 @@ HammerThrow::HammerThrow(sf::Vector2f sp) : Attack(sp), fc(true){
     this->sprite.setTexture(this->texture);
     this->sprite.setPosition(this->pos);
     this->sprite.setScale(32.0f/this->texture.getSize().x, 32.0f/this->texture.getSize().y);
+    this->sprite.move(0,-this->sprite.getGlobalBounds().height);
 }
 
 bool HammerThrow::update(sf::FloatRect player){
-    if(fc){
-        this->velocity = player.getPosition() + player.getSize()/2.0f - this->pos;
-        this->velocity /= sqrt(this->velocity.x*this->velocity.x + this->velocity.y*this->velocity.y);
-        this->velocity *= 15.0f;
-        fc = false;
-    }
-    else{
-        this->pos += this->velocity;
-        this->sprite.rotate(5);
-        this->sprite.setPosition(this->pos);
-    }
-    if(player.intersects(this->sprite.getGlobalBounds()))
-        exit(0);
-    return false;
+    //hammer throw should be changed to throw multiple hammers in different directions at the same time
+    
 }
 
 void HammerThrow::draw(sf::RenderWindow &window){
@@ -65,4 +54,51 @@ bool Plank::update(sf::FloatRect player){
 void Plank::draw(sf::RenderWindow &window){
     window.draw(this->sprite[0]);
     window.draw(this->sprite[1]);
+}
+
+LaserBeam::LaserBeam(sf::Vector2f sp, float rotangle) : Attack(sp), fc(true){
+    this->texture.loadFromFile("../imgs/laser.png");
+    this->sprite.setTexture(this->texture);
+    this->sprite.setPosition(this->pos);
+    this->sprite.rotate(90 + rotangle);
+}
+
+bool LaserBeam::update(sf::FloatRect player){
+    if(fc){
+        this->velocity = player.getPosition() + player.getSize()/2.0f - this->pos;
+        this->velocity /= sqrt(this->velocity.x*this->velocity.x + this->velocity.y*this->velocity.y);
+        this->velocity *= 20.0f;
+        fc = false;
+    }
+    else{
+        this->pos += this->velocity;
+        this->sprite.setPosition(this->pos);
+    }
+    if(player.intersects(this->sprite.getGlobalBounds()))
+        exit(0);
+    return false;
+}
+
+void LaserBeam::draw(sf::RenderWindow &window){
+    window.draw(this->sprite);
+}
+
+TableFall::TableFall(sf::Vector2f sp) : Attack(sp){
+    this->texture.loadFromFile("../imgs/table.png");
+    this->sprite.setTexture(this->texture);
+    this->sprite.setOrigin(this->texture.getSize().x/2.0f, this->texture.getSize().y);
+    this->sprite.setScale(60.0f/this->texture.getSize().x, 30.0f/this->texture.getSize().y);
+    this->sprite.setPosition(this->pos);
+}
+
+bool TableFall::update(sf::FloatRect player){
+    this->velocity.y += 0.5f;
+    this->sprite.move(0,velocity.y);
+    if(this->sprite.getGlobalBounds().intersects(player))
+        exit(0);
+    return false;
+}
+
+void TableFall::draw(sf::RenderWindow &window){
+    window.draw(this->sprite);
 }

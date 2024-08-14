@@ -11,7 +11,7 @@ Map::Object::Object(int x, int y, int w, int h, std::string tname) : rect(sf::Ve
     this->rect.setTextureRect(sf::IntRect(0, 0, w, h)); // Texture repeated over 400x300 area
     this->rect.setPosition(x, y);
 
-    // Setting the texture ID by removing the suffix .png and turning what is left to a number
+    // Setting the texture ID by removing the path prefix and the suffix .png and turning what is left to a number
     tname=tname.substr(tname.length() - 5, 5);
     tname.erase(tname.length() - 4);
     this->texid = std::stoi(tname);
@@ -68,7 +68,6 @@ void Map::addObject(int x, int y, int w, int h, std::string tname)
 {
     int wx = this->wndref.getSize().x, wy = this->wndref.getSize().y;
     this->obj[mx][my].push_back(new Object(x + wx*mx, y + wy*my, w, h, tname));
-    std::cout << "object added to " << x + wx*mx << " " << y + wy*my << std::endl;
 }
 
 void Map::removeObject(int index){
@@ -118,7 +117,6 @@ void Map::changePart(int x, int y)
     int wx = this->wndref.getSize().x, wy = this->wndref.getSize().y;
     this->view.setCenter(wx/2 + wx*this->mx, wy/2 + wy*this->my);
     this->wndref.setView(view);
-    std::cout << "changed to " << mx << " " << my << " center " << view.getCenter().x << " " << view.getCenter().y << std::endl;
 }
 
 sf::FloatRect Map::getPartBounds(){
