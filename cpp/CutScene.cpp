@@ -3,7 +3,7 @@
 #include <algorithm>
 
 CutScene::CutScene(const std::vector<std::string>& imagePaths, const sf::Vector2u& windowSize)
-    : currentFrame(0), fadeTime(0), frameDuration(2.0f), pauseDuration(0.5f), 
+    : currentFrame(0), fadeTime(0), frameDuration(0.0f), pauseDuration(0.0f), 
       isFinished(false), isPaused(false), cutSceneFinished(false), windowSize(windowSize) {
     loadTextures(imagePaths);
     if (!textures.empty()) {

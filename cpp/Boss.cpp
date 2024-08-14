@@ -2,7 +2,7 @@
 #include <iostream>
 
 Boss::Boss(const std::string &imagePath, sf::Vector2u windowSize)
-    : targetWidth(200.0f), windowSize(windowSize), bounceSpeed(200.0f), spawnTimer(0.0f)
+    : targetWidth(200.0f), windowSize(windowSize), bounceSpeed(200.0f)
 {
     sprite.setOrigin(514,366);
     loadAndScaleImage(imagePath);
@@ -54,33 +54,6 @@ void Boss::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf::
         velocity.x = -velocity.x;
     }
 
-    //sprite.setPosition(position);
-
-    // Spawn Idk objects
-    spawnTimer += deltaTime;
-    if (spawnTimer >= 2.0f)
-    { // Spawn every 2 seconds
-        if (isOnScreen(map.getPartBounds()))
-        {
-            spawnIdk();
-        }
-        spawnTimer = 0.0f; // Reset the timer
-    }
-
-    // Update all Idk objects
-    for (auto it = idkObjects.begin(); it != idkObjects.end();)
-    {
-        (*it)->update(deltaTime, map, windowSize);
-        if ((*it)->isOutOfBounds(windowSize))
-        {
-            it = idkObjects.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
-
     // Create Attacks
     sf::Vector2f vdis = player.getPosition() + player.getSize() / 2.0f - this->sprite.getPosition();
     float distance = sqrt(vdis.x * vdis.x + vdis.y * vdis.y);
@@ -117,12 +90,6 @@ void Boss::draw(sf::RenderWindow &window)
 {
     window.draw(sprite);
 
-    // Draw all Idk objects
-    for (const auto &idk : idkObjects)
-    {
-        idk->draw(window);
-    }
-
     // Draw all attacks
     for (const auto &at : attacks)
     {
@@ -132,13 +99,11 @@ void Boss::draw(sf::RenderWindow &window)
     window.draw(this->eyesprite);
 }
 
-void Boss::spawnIdk()
-{
-
-    sf::Vector2f spawnPosition = sprite.getPosition();
-    spawnPosition.y += sprite.getGlobalBounds().height; // Spawn below the boss
-    float moveDistance = 200.0f;
-    idkObjects.push_back(std::make_unique<Idk>(spawnPosition, moveDistance));
+void Boss::resetTimers(){
+    this->ttimer.restart();
+    this->ltimer.restart();
+    this->atimer.restart();
+    this->ptimer.restart();
 }
 
 Boss::~Boss()
