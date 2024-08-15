@@ -92,7 +92,7 @@ TableFall::TableFall(sf::Vector2f sp) : Attack(sp){
 }
 
 bool TableFall::update(sf::FloatRect player){
-    this->velocity.y += 0.5f;
+    this->velocity.y += 0.45f;
     this->sprite.move(0,velocity.y);
     if(this->sprite.getGlobalBounds().intersects(player))
         exit(0);

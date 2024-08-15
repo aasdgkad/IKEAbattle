@@ -20,3 +20,4 @@
 #include "Boss.hpp"
 #include "PacMan.hpp"
 #include "player.hpp"
+#include "Menu.hpp"
