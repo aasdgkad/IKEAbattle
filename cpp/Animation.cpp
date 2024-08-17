@@ -8,6 +8,10 @@ Animation::Animation()
 void Animation::loadSpritesheet(const std::string& filename, int cellWidth, int cellHeight)
 {
     spritesheet.loadFromFile(filename);
+    if (!spritesheet.loadFromFile(filename)) {
+            // Handle error
+            std::cerr << "Failed to load texture: " << filename << std::endl;
+        }
     sprite.setTexture(spritesheet);
     this->cellWidth = cellWidth;
     this->cellHeight = cellHeight;

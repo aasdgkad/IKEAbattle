@@ -7,18 +7,20 @@ TARGET = ikea
 # Directories
 INCLUDE_DIR = D:\ikeaBattle\SFML-2.6.1\include
 LIB_DIR = D:\ikeaBattle\SFML-2.6.1\lib
+FREETYPE_INCLUDE = D:\path\to\freetype\include
+FREETYPE_LIB = D:\path\to\freetype\lib
 
 # Source Files
-SRC = main.cpp player.cpp CutScene.cpp map.cpp Boss.cpp Animation.cpp CollisionDetector.cpp Entity.cpp idk.cpp attack.cpp PacMan.cpp
+SRC = main.cpp player.cpp CutScene.cpp map.cpp Boss.cpp Animation.cpp CollisionDetector.cpp Entity.cpp idk.cpp attack.cpp PacMan.cpp Menu.cpp GameOverScreen.cpp
 
 # Object Files
 OBJ = $(SRC:.cpp=.o)
 
 # Compiler Flags
-CXXFLAGS = -I$(INCLUDE_DIR) -DSFML_STATIC
+CXXFLAGS = -I$(INCLUDE_DIR) -I$(FREETYPE_INCLUDE) -DSFML_STATIC
 
 # Linker Flags
-LDFLAGS = -L$(LIB_DIR) -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lsfml-audio-s -lsfml-network-s -lopengl32 -lgdi32 -lwinmm -static
+LDFLAGS = -L$(LIB_DIR) -L$(FREETYPE_LIB) -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lsfml-audio-s -lsfml-network-s -lfreetype -lopengl32 -lgdi32 -lwinmm -static
 
 # Default rule
 all: $(TARGET) run

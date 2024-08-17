@@ -1,10 +1,10 @@
 #include "../hpp/libs.hpp"
 
-Attack::Attack(sf::Vector2f sp) : pos(sp) {
+Attack::Attack(sf::Vector2f sp,bool &gameOver) : pos(sp),gameOver(&gameOver) {
 
 }
 
-HammerThrow::HammerThrow(sf::Vector2f sp) : Attack(sp), fc(true){
+HammerThrow::HammerThrow(sf::Vector2f sp,bool &gameOver) : Attack(sp,gameOver), fc(true){
     this->texture.loadFromFile("../imgs/hammer.jpg");
     this->sprite.setTexture(this->texture);
     this->sprite.setPosition(this->pos);
@@ -21,7 +21,7 @@ void HammerThrow::draw(sf::RenderWindow &window){
     window.draw(this->sprite);
 }
 
-Plank::Plank(sf::Vector2f sp) : Attack(sp), fc(true){
+Plank::Plank(sf::Vector2f sp,bool &gameOver) : Attack(sp,gameOver), fc(true){
     this->texture.loadFromFile("../imgs/plank.png");
     this->sprite[0].setTexture(this->texture);
     this->sprite[0].setScale(20.0f/this->texture.getSize().x, 100.0f/this->texture.getSize().y);
@@ -47,7 +47,7 @@ bool Plank::update(sf::FloatRect player){
             return true;
     }
     if(this->sprite[0].getGlobalBounds().intersects(player) || this->sprite[1].getGlobalBounds().intersects(player))
-        exit(0);
+        (*gameOver)=true;
     return false;
 }
 
@@ -56,7 +56,7 @@ void Plank::draw(sf::RenderWindow &window){
     window.draw(this->sprite[1]);
 }
 
-LaserBeam::LaserBeam(sf::Vector2f sp, float rotangle) : Attack(sp), fc(true){
+LaserBeam::LaserBeam(sf::Vector2f sp, float rotangle,bool &gameOver) : Attack(sp,gameOver), fc(true){
     this->texture.loadFromFile("../imgs/laser.png");
     this->sprite.setTexture(this->texture);
     this->sprite.setPosition(this->pos);
@@ -75,7 +75,7 @@ bool LaserBeam::update(sf::FloatRect player){
         this->sprite.setPosition(this->pos);
     }
     if(player.intersects(this->sprite.getGlobalBounds()))
-        exit(0);
+        (*gameOver)=true;
     return false;
 }
 
@@ -83,7 +83,7 @@ void LaserBeam::draw(sf::RenderWindow &window){
     window.draw(this->sprite);
 }
 
-TableFall::TableFall(sf::Vector2f sp) : Attack(sp){
+TableFall::TableFall(sf::Vector2f sp,bool &gameOver) : Attack(sp,gameOver){
     this->texture.loadFromFile("../imgs/table.png");
     this->sprite.setTexture(this->texture);
     this->sprite.setOrigin(this->texture.getSize().x/2.0f, this->texture.getSize().y);
@@ -92,10 +92,10 @@ TableFall::TableFall(sf::Vector2f sp) : Attack(sp){
 }
 
 bool TableFall::update(sf::FloatRect player){
-    this->velocity.y += 0.45f;
+    this->velocity.y += 0.5f;
     this->sprite.move(0,velocity.y);
     if(this->sprite.getGlobalBounds().intersects(player))
-        exit(0);
+        (*gameOver)=true;
     return false;
 }
 

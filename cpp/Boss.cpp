@@ -1,8 +1,8 @@
 #include "../hpp/libs.hpp"
-#include <iostream>
 
 Boss::Boss(const std::string &imagePath, sf::Vector2u windowSize)
-    : targetWidth(200.0f), windowSize(windowSize), bounceSpeed(200.0f)
+    : targetWidth(200.0f), windowSize(windowSize), bounceSpeed(200.0f),
+      isMovingToTarget(false), spinSpeed(0), moveSpeed(0),gameOver(false)
 {
     sprite.setOrigin(514,366);
     loadAndScaleImage(imagePath);
@@ -36,8 +36,37 @@ void Boss::setInitialPosition()
 
 void Boss::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf::FloatRect player)
 {
+if (isMovingToTarget)
+    {
+        sf::Vector2f currentPosition = sprite.getPosition();
+        sf::Vector2f direction = targetLocation - currentPosition;
+        float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 
-    sf::Vector2f ptb = sprite.getPosition() - player.getPosition();
+        if (distance > moveSpeed * deltaTime)
+        {
+            // Normalize the direction vector
+            direction /= distance;
+            
+            // Move towards the target
+            sprite.move(direction * moveSpeed * deltaTime);
+            
+            // Spin the boss
+            sprite.rotate(spinSpeed * deltaTime);
+        }
+        else
+        {
+            // Boss has reached the target location
+            sprite.setPosition(targetLocation);
+            isMovingToTarget = false;
+            sprite.setRotation(0); // Reset rotation if needed
+        }
+
+        // Update eye sprite position
+        eyesprite.setPosition(sprite.getPosition().x - eyesprite.getGlobalBounds().width/2.0f, 
+                              sprite.getPosition().y - eyesprite.getGlobalBounds().height/2.0f);
+    }
+    else{
+sf::Vector2f ptb = sprite.getPosition() - player.getPosition();
     // 514, 366
     if (((player.left < sprite.getPosition().x) && (sprite.getScale().x > 0)) || ((player.left > sprite.getPosition().x) && (sprite.getScale().x < 0)))
     {
@@ -48,33 +77,30 @@ void Boss::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf::
     else
         sprite.setRotation(atan(ptb.y / ptb.x) * 180 / 3.14159);
 
-    // Bounce off the left and right edges of the window
-    if (position.x <= 0 || position.x + sprite.getGlobalBounds().width >= windowSize.x)
-    {
-        velocity.x = -velocity.x;
-    }
-
     // Create Attacks
     sf::Vector2f vdis = player.getPosition() + player.getSize() / 2.0f - this->sprite.getPosition();
     float distance = sqrt(vdis.x * vdis.x + vdis.y * vdis.y);
 
     if (ptimer.getElapsedTime().asSeconds() >= 3.5)
     {
-        this->attacks.push_back(new Plank(this->sprite.getPosition()));
+        this->attacks.push_back(new Plank(this->sprite.getPosition(),gameOver));
         ptimer.restart();
     }
 
     if (ltimer.getElapsedTime().asSeconds() >= 0.8)
     {
-        this->attacks.push_back(new LaserBeam(this->sprite.getPosition(), this->sprite.getRotation()));
+        this->attacks.push_back(new LaserBeam(this->sprite.getPosition(), this->sprite.getRotation(),gameOver));
         ltimer.restart();
     }
 
     if(ttimer.getElapsedTime().asSeconds() >= 2.3){
         //int randx = rand()%int(3*player.width) + player.left - player.width;
-        this->attacks.push_back(new TableFall(sf::Vector2f(player.left+player.width/2.0f,map.getPartBounds().top)));
+        this->attacks.push_back(new TableFall(sf::Vector2f(player.left+player.width/2.0f,map.getPartBounds().top),gameOver));
         ttimer.restart();
     }
+    }
+    
+
 
     // Manage attacks behavior
     for (int i = 0; i < this->attacks.size(); i++)
@@ -104,6 +130,21 @@ void Boss::resetTimers(){
     this->ltimer.restart();
     this->atimer.restart();
     this->ptimer.restart();
+}
+
+void Boss::moveToLocationWithSpin(const sf::Vector2f& targetLocation, float spinSpeed, float moveSpeed)
+{
+    this->targetLocation = targetLocation;
+    this->isMovingToTarget = true;
+    this->spinSpeed = spinSpeed;
+    this->moveSpeed = moveSpeed;
+}
+
+void Boss::moveRandomlyOnXAxis(float minX, float maxX)
+{
+    float currentY = sprite.getPosition().y;
+    float newX = minX + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (maxX - minX)));
+    moveToLocationWithSpin(sf::Vector2f(newX, currentY), 1700.0f, 200.0f);
 }
 
 Boss::~Boss()
