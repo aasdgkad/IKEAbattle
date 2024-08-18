@@ -21,3 +21,6 @@
 #include "PacMan.hpp"
 #include "player.hpp"
 #include "Menu.hpp"
+#include "GameOverScreen.hpp"
+#include "item.hpp"
+#include "inventory.hpp"
