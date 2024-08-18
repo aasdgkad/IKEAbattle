@@ -35,6 +35,7 @@ int main()
     Player *player = new Player(sf::Vector2f(500, 384));
     PacMan *twoPac = new PacMan(sf::Vector2f(-107, 384));
     Idk *wtf = new Idk(sf::Vector2f(300, 300), 200);
+    Inventory inventory(map, player, window);
 
     GameState currentState = GameState::Menu;
     sf::Clock clock;
@@ -94,12 +95,14 @@ int main()
                 boss->update(deltaTime, map, window.getSize(), player->getBounds());
                 wtf->update(deltaTime, map, window.getSize());
                 player->update(deltaTime, map, window.getSize());
+                inventory.update();
 
                 map.draw();
                 boss->draw(window);
                 wtf->draw(window);
                 twoPac->draw(window);
                 player->draw(window);
+                inventory.draw();
             }
             break;
         case GameState::GameOver:

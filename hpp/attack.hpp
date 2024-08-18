@@ -2,19 +2,19 @@
 
 class Attack{
     public:
-    Attack(sf::Vector2f sp);
+    Attack(sf::Vector2f sp,bool &gameOver);
 
     virtual bool update(sf::FloatRect player) = 0;
 
     virtual void draw(sf::RenderWindow &window) = 0;
-
+    bool *gameOver;
     sf::Vector2f pos;
     sf::FloatRect hitbox;
 };
 
 class HammerThrow : public Attack{
     public:
-    HammerThrow(sf::Vector2f sp);
+    HammerThrow(sf::Vector2f sp,bool &gameOver);
 
     bool update(sf::FloatRect player) override;
 
@@ -29,7 +29,7 @@ class HammerThrow : public Attack{
 
 class Plank : public Attack{
     public:
-    Plank(sf::Vector2f sp);
+    Plank(sf::Vector2f sp,bool &gameOver);
 
     bool update(sf::FloatRect player) override;
 
@@ -45,7 +45,7 @@ class Plank : public Attack{
 
 class LaserBeam : public Attack{
     public:
-    LaserBeam(sf::Vector2f sp, float rotangle);
+    LaserBeam(sf::Vector2f sp, float rotangle,bool &gameOver);
 
     bool update(sf::FloatRect player) override;
 
@@ -61,7 +61,7 @@ class LaserBeam : public Attack{
 
 class TableFall : public Attack{
     public:
-    TableFall(sf::Vector2f sp);
+    TableFall(sf::Vector2f sp,bool &gameOver);
 
     bool update(sf::FloatRect player) override;
 
@@ -74,4 +74,3 @@ class TableFall : public Attack{
     sf::Clock timer;
     bool fc;
 };
-
