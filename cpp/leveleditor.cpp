@@ -78,6 +78,8 @@ int main()
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
             auto mp = sf::Mouse::getPosition(window);
+            mp.x = mp.x + map.getPartBounds().getPosition().x;
+            mp.y = mp.y + map.getPartBounds().getPosition().y;
             auto list = map.getObjectBounds();
             for(int i = 0; i < list.size(); i++){
                 if(list[i].contains(mp.x, mp.y)){
