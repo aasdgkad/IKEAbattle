@@ -1,13 +1,12 @@
 #include "../hpp/libs.hpp"
 
-GameOverScreen::GameOverScreen() {
-    if (!font.loadFromFile("../fonts//ARIAL.TTF")) {
-        // Handle font loading error
+GameOverScreen::GameOverScreen(sf::RenderWindow & window) : windowr(window) {
+        if (!font.loadFromFile("../fonts//ARIAL.TTF")) {
+            // Handle font loading error
+        }
+        initializeText();
+        initializeButton();
     }
-
-    initializeText();
-    initializeButton();
-}
 
 void GameOverScreen::initializeText() {
     gameOverText.setFont(font);
@@ -26,35 +25,48 @@ void GameOverScreen::initializeButton() {
     returnToMenuButton.setFillColor(sf::Color::White);
 }
 
-void GameOverScreen::draw(sf::RenderWindow& window) {
-    // Center the game over text
-    gameOverText.setPosition(
-        window.getSize().x / 2 - gameOverText.getGlobalBounds().width / 2,
-        window.getSize().y / 3 - gameOverText.getGlobalBounds().height / 2
-    );
+void GameOverScreen::draw(){
+        // Save the current view
+        sf::View originalView = windowr.getView();
 
-    // Position the button
-    returnToMenuButton.setPosition(
-        window.getSize().x / 2 - returnToMenuButton.getSize().x / 2,
-        window.getSize().y * 2 / 3 - returnToMenuButton.getSize().y / 2
-    );
+        // Reset the view to the default (window coordinates)
+        windowr.setView(windowr.getDefaultView());
 
-    // Center the text on the button
-    returnToMenuText.setPosition(
-        returnToMenuButton.getPosition().x + (returnToMenuButton.getSize().x - returnToMenuText.getGlobalBounds().width) / 2,
-        returnToMenuButton.getPosition().y + (returnToMenuButton.getSize().y - returnToMenuText.getGlobalBounds().height) / 2 - 5
-    );
+        // Center the game over text
+        gameOverText.setPosition(
+            windowr.getSize().x / 2 - gameOverText.getGlobalBounds().width / 2,
+            windowr.getSize().y / 3 - gameOverText.getGlobalBounds().height / 2
+        );
 
-    window.draw(gameOverText);
-    window.draw(returnToMenuButton);
-    window.draw(returnToMenuText);
-}
+        // Position the button
+        returnToMenuButton.setPosition(
+            windowr.getSize().x / 2 - returnToMenuButton.getSize().x / 2,
+            windowr.getSize().y * 2 / 3 - returnToMenuButton.getSize().y / 2
+        );
 
-bool GameOverScreen::handleEvent(const sf::Event& event, const sf::Vector2i& mousePosition) {
-    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-        if (returnToMenuButton.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosition))) {
-            return true;  // Return true to indicate that the button was clicked
-        }
+        // Center the text on the button
+        returnToMenuText.setPosition(
+            returnToMenuButton.getPosition().x + (returnToMenuButton.getSize().x - returnToMenuText.getGlobalBounds().width) / 2,
+            returnToMenuButton.getPosition().y + (returnToMenuButton.getSize().y - returnToMenuText.getGlobalBounds().height) / 2 - 5
+        );
+
+        windowr.draw(gameOverText);
+        windowr.draw(returnToMenuButton);
+        windowr.draw(returnToMenuText);
+
+        // Restore the original view
+        windowr.setView(originalView);
     }
-    return false;
-}
+
+bool GameOverScreen::handleEvent(const sf::Event& event) {
+        if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+            // Convert mouse position to window coordinates
+            sf::Vector2i mousePosition = sf::Mouse::getPosition(windowr);
+            sf::Vector2f worldPos = windowr.mapPixelToCoords(mousePosition);
+
+            if (returnToMenuButton.getGlobalBounds().contains(mousePosition.x,mousePosition.y)) {
+                return true;  // Return true to indicate that the button was clicked
+            }
+        }
+        return false;
+    }

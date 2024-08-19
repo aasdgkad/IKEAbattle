@@ -1,7 +1,9 @@
 #pragma once
 class Animation;
+class Item;
 
 class Player : public Entity {
+    friend class Item;
 public:
     Player(sf::Vector2f position);
     void update(float deltaTime, Map& map, const sf::Vector2u& screenres, sf::FloatRect playerBounds = sf::FloatRect()) override;

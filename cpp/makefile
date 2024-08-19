@@ -11,7 +11,7 @@ FREETYPE_INCLUDE = D:\path\to\freetype\include
 FREETYPE_LIB = D:\path\to\freetype\lib
 
 # Source Files
-SRC = main.cpp player.cpp CutScene.cpp map.cpp Boss.cpp Animation.cpp CollisionDetector.cpp Entity.cpp idk.cpp attack.cpp PacMan.cpp Menu.cpp GameOverScreen.cpp
+SRC = main.cpp player.cpp CutScene.cpp map.cpp Boss.cpp Animation.cpp CollisionDetector.cpp Entity.cpp idk.cpp attack.cpp PacMan.cpp Menu.cpp GameOverScreen.cpp inventory.cpp item.cpp
 
 # Object Files
 OBJ = $(SRC:.cpp=.o)

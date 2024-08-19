@@ -1,7 +1,7 @@
 #include "../hpp/libs.hpp"
 
 Attack::Attack(sf::Vector2f sp,bool &gameOver) : pos(sp),gameOver(&gameOver) {
-
+    
 }
 
 HammerThrow::HammerThrow(sf::Vector2f sp,bool &gameOver) : Attack(sp,gameOver), fc(true){
@@ -14,7 +14,7 @@ HammerThrow::HammerThrow(sf::Vector2f sp,bool &gameOver) : Attack(sp,gameOver), 
 
 bool HammerThrow::update(sf::FloatRect player){
     //hammer throw should be changed to throw multiple hammers in different directions at the same time
-    
+    return false;
 }
 
 void HammerThrow::draw(sf::RenderWindow &window){

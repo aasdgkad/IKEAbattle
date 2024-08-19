@@ -1,14 +1,16 @@
 #include "../hpp/libs.hpp"
 
-Menu::Menu(const sf::Vector2u& windowSize) {
-    if (!font.loadFromFile("../fonts/ARIAL.TTF")) {
+Menu::Menu(sf::RenderWindow &window) : windowr(window)
+{
+    if (!font.loadFromFile("../fonts/ARIAL.TTF"))
+    {
         // Handle font loading error
     }
 
     playButton.setSize(sf::Vector2f(200, 50));
     playButton.setFillColor(sf::Color::Yellow);
-    playButton.setPosition((windowSize.x - playButton.getSize().x) / 2, 
-                           (windowSize.y - playButton.getSize().y) / 2);
+    playButton.setPosition((windowr.getSize().x - playButton.getSize().x) / 2,
+                           (windowr.getSize().y - playButton.getSize().y) / 2);
 
     playText.setFont(font);
     playText.setString("Play");
@@ -17,22 +19,35 @@ Menu::Menu(const sf::Vector2u& windowSize) {
     sf::FloatRect textRect = playText.getLocalBounds();
     playText.setOrigin(textRect.left + textRect.width / 2.0f,
                        textRect.top + textRect.height / 2.0f);
-    playText.setPosition(playButton.getPosition() + 
+    playText.setPosition(playButton.getPosition() +
                          sf::Vector2f(playButton.getSize().x / 2, playButton.getSize().y / 2));
 }
 
-void Menu::draw(sf::RenderWindow& window) {
-    window.draw(playButton);
-    window.draw(playText);
+void Menu::draw()
+{
+    // Save the current view
+    sf::View originalView = windowr.getView();
+
+    // Reset the view to the default (window coordinates)
+    windowr.setView(windowr.getDefaultView());
+    windowr.draw(playButton);
+    windowr.draw(playText);
+    // Restore the original view
+    windowr.setView(originalView);
 }
 
-bool Menu::isPlayButtonClicked(const sf::Vector2i& mousePosition) {
-    return playButton.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosition));
+bool Menu::isPlayButtonClicked()
+{
+    return playButton.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(windowr)));
 }
-void Menu::updateButtonColor(const sf::Vector2i& mousePosition) {
-    if (playButton.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosition))) {
+void Menu::updateButtonColor()
+{
+    if (playButton.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(windowr))))
+    {
         playButton.setFillColor(sf::Color::Red);
-    } else {
+    }
+    else
+    {
         playButton.setFillColor(sf::Color::Yellow);
     }
 }

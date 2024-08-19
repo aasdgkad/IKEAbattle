@@ -9,8 +9,6 @@ PacMan::PacMan(sf::Vector2f spawnPosition)
 
 PacMan::~PacMan()
 {
-    // Destructor logic (if needed)
-    std::cout << "PacMan destroyed!" << std::endl;
 }
 
 void PacMan::loadSprite()
