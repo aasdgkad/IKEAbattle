@@ -1,15 +1,14 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
-
 class GameOverScreen {
 public:
-    GameOverScreen();
-    void draw(sf::RenderWindow& window);
-    bool handleEvent(const sf::Event& event, const sf::Vector2i& mousePosition);
+    GameOverScreen(sf::RenderWindow &window);
+    void draw();
+    bool handleEvent(const sf::Event& event);
     bool gameOver;
 
 private:
+    sf::RenderWindow &windowr;
     sf::Font font;
     sf::Text gameOverText;
     sf::Text returnToMenuText;

@@ -7,7 +7,7 @@ class Inventory{
 
     void update();
     void draw();
-
+    void reset(Player* player);
     private:
     sf::Font font;
     sf::Text text;
