@@ -10,17 +10,19 @@ enum class GameState
     Playing,
     GameOver
 };
-void resetGame(Boss *&boss, Player *&player, PacMan *&twoPac, Idk *&wtf, Inventory &inventory, sf::RenderWindow &window, Map &map)
+void resetGame(Boss *&boss, Player *&player, PacMan *&twoPac, Idk *&wtf, Npc *&npc, Inventory &inventory, sf::RenderWindow &window, Map &map, std::unique_ptr<TextBox> &textBox)
 {
-    delete twoPac, boss, player, wtf;
+    delete twoPac, boss, player, wtf, npc;
     boss = new Boss("../imgs/ikeaman.jpg", window.getSize());
     player = new Player(sf::Vector2f(500, 384));
     twoPac = new PacMan(sf::Vector2f(-107, 384));
     wtf = new Idk(sf::Vector2f(300, 300), 200);
+    npc = new Npc(sf::Vector2f(1300, 300), textBox.get());
 
     // Reinitialize the inventory with the new player
     inventory.reset(player);
 }
+
 int main()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
@@ -33,16 +35,17 @@ int main()
     };
     CutScene cutScene(cutSceneImages, window.getSize());
     Map map("../map.mib", window);
+    std::unique_ptr<TextBox> textBox = std::make_unique<TextBox>("", 0.1f);
     Player *player = new Player(sf::Vector2f(500, 384));
     PacMan *twoPac = new PacMan(sf::Vector2f(-107, 384));
     Idk *wtf = new Idk(sf::Vector2f(300, 300), 200);
+    Npc *npc = new Npc(sf::Vector2f(1300, 300), textBox.get());
     GameOverScreen gameOverScreen(window);
     Menu menu(window);
     Inventory inventory(map, player, window);
 
     GameState currentState = GameState::Menu;
     sf::Clock clock;
-    sf::Clock bossMovementClock;
 
     while (window.isOpen())
     {
@@ -63,10 +66,9 @@ int main()
         case GameState::Menu:
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left && menu.isPlayButtonClicked())
             {
-                resetGame(boss, player, twoPac, wtf, inventory, window, map);
+                resetGame(boss, player, twoPac, wtf, npc, inventory, window, map, textBox);
                 currentState = GameState::CutScene;
                 clock.restart();
-                bossMovementClock.restart();
             }
             menu.updateButtonColor();
             menu.draw();
@@ -86,25 +88,22 @@ int main()
             }
             else
             {
-                if (bossMovementClock.getElapsedTime().asSeconds() >= 3.0f)
-                {
-                    float minX = 0;
-                    float maxX = window.getSize().x;
-                    boss->moveRandomlyOnXAxis(minX, maxX);
-                    bossMovementClock.restart();
-                }
                 twoPac->update(deltaTime, map, window.getSize());
-                boss->update(deltaTime, map, window.getSize(), player->getBounds());
                 wtf->update(deltaTime, map, window.getSize());
+                npc->update(deltaTime, map, window.getSize(), player->getBounds());
                 player->update(deltaTime, map, window.getSize());
+                boss->update(deltaTime, map, window.getSize(),player->getBounds());
+                textBox->update(deltaTime);
                 inventory.update();
 
                 map.draw();
                 boss->draw(window);
                 wtf->draw(window);
+                npc->draw(window);
                 twoPac->draw(window);
                 player->draw(window);
                 inventory.draw();
+                textBox->draw(window);
             }
             break;
         case GameState::GameOver:

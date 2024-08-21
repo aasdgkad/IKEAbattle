@@ -80,7 +80,7 @@ void Player::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf
        handleInput();
        velocity.y += gravity * deltaTime;
        position += velocity * deltaTime;
-       getSprite().setPosition(position);
+       setPosition(position);
        manageCollisions(map.getObjectBounds());
        checkBounds(screenres, map);
        updateAnimation();
