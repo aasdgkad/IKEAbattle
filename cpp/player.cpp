@@ -1,7 +1,7 @@
 #include "../hpp/libs.hpp"
 #include <iostream>
 
-Player::Player(sf::Vector2f position) : Entity()
+Player::Player(sf::Vector2f position,bool &gameoverr) : Entity(), gameover(&gameoverr)
 {
        loadAnimations();
        setPosition(position);
@@ -77,6 +77,9 @@ void Player::updateAnimation()
 
 void Player::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf::FloatRect playerBounds)
 {
+       if(velocity.y>5777){
+              (*gameover)=true;
+       }
        handleInput();
        velocity.y += gravity * deltaTime;
        position += velocity * deltaTime;

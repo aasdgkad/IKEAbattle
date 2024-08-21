@@ -1,7 +1,7 @@
 #include "../hpp/libs.hpp"
 
-Boss::Boss(const std::string &imagePath, sf::Vector2u windowSize)
-    : targetWidth(200.0f), windowSize(windowSize), gameOver(false)
+Boss::Boss(const std::string &imagePath, sf::Vector2u windowSize,bool &gameOverr)
+    : targetWidth(200.0f), windowSize(windowSize),gameover(&gameOverr)
 {
     sprite.setOrigin(514, 366);
     loadAndScaleImage(imagePath);
@@ -79,19 +79,19 @@ void Boss::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf::
     {
         if (ptimer.getElapsedTime().asSeconds() >= 3.5)
         {
-            this->attacks.push_back(new Plank(this->sprite.getPosition(), gameOver));
+            this->attacks.push_back(new Plank(this->sprite.getPosition(), *gameover));
             ptimer.restart();
         }
 
         if (ltimer.getElapsedTime().asSeconds() >= 0.8)
         {
-            this->attacks.push_back(new LaserBeam(this->sprite.getPosition(), this->sprite.getRotation(), gameOver));
+            this->attacks.push_back(new LaserBeam(this->sprite.getPosition(), this->sprite.getRotation(), *gameover));
             ltimer.restart();
         }
 
         if (ttimer.getElapsedTime().asSeconds() >= 2.3)
         {
-            this->attacks.push_back(new TableFall(sf::Vector2f(player.left + player.width / 2.0f, map.getPartBounds().top), gameOver));
+            this->attacks.push_back(new TableFall(sf::Vector2f(player.left + player.width / 2.0f, map.getPartBounds().top), *gameover));
             ttimer.restart();
         }
     }

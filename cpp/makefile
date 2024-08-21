@@ -2,12 +2,12 @@
 CXX = g++ -g
 
 # Project Name
-TARGET = ikea
+TARGET = cpp/levelEditor
 
 # Directories
 INCLUDE_DIR = D:\ikeaBattle\SFML-2.6.1\include
 LIB_DIR = D:\ikeaBattle\SFML-2.6.1\lib
-FREETYPE_INCLUDE = D:\path\to\freetype\include
+FREETYPE_INCLUDE = D:\ikeaBattle\freeType\freetype-2.13.3\include
 FREETYPE_LIB = D:\path\to\freetype\lib
 
 # Source Files

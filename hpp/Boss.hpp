@@ -2,14 +2,14 @@
 
 class Boss : public Entity  {
 public:
-    Boss(const std::string& imagePath, sf::Vector2u windowSize);
+    Boss(const std::string& imagePath, sf::Vector2u windowSize,bool &gameOver);
     void update(float deltaTime, Map& map, const sf::Vector2u& screenres, sf::FloatRect playerBounds) override;
     void draw(sf::RenderWindow& window);
     void resetTimers();
     ~Boss();
-    bool gameOver;
 
 private:
+    bool *gameover;
     sf::Texture texture;
     sf::Texture eyetexture;
     sf::Sprite sprite;

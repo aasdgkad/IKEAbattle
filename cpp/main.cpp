@@ -10,11 +10,11 @@ enum class GameState
     Playing,
     GameOver
 };
-void resetGame(Boss *&boss, Player *&player, PacMan *&twoPac, Idk *&wtf, Npc *&npc, Inventory &inventory, sf::RenderWindow &window, Map &map, std::unique_ptr<TextBox> &textBox)
+void resetGame(Boss *&boss, Player *&player, PacMan *&twoPac, Idk *&wtf, Npc *&npc, Inventory &inventory, sf::RenderWindow &window, Map &map, std::unique_ptr<TextBox> &textBox,bool &gameover)
 {
     delete twoPac, boss, player, wtf, npc;
-    boss = new Boss("../imgs/ikeaman.jpg", window.getSize());
-    player = new Player(sf::Vector2f(500, 384));
+    boss = new Boss("../imgs/ikeaman.jpg", window.getSize(),gameover);
+    player = new Player(sf::Vector2f(500, 384),gameover);
     twoPac = new PacMan(sf::Vector2f(-107, 384));
     wtf = new Idk(sf::Vector2f(300, 300), 200);
     npc = new Npc(sf::Vector2f(1300, 300), textBox.get());
@@ -29,14 +29,15 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1024, 768), "SFML Player", sf::Style::Default);
     window.setFramerateLimit(60);
 
-    Boss *boss = new Boss("../imgs/ikeaman.jpg", window.getSize());
     std::vector<std::string> cutSceneImages = {
         //"../imgs/player.png", "../imgs/2sleepHours.jpg", "../imgs/fun.jpg", "../imgs/haha.jpg"
     };
+    bool gameOver;
+    Boss *boss = new Boss("../imgs/ikeaman.jpg", window.getSize(),gameOver);
     CutScene cutScene(cutSceneImages, window.getSize());
     Map map("../map.mib", window);
     std::unique_ptr<TextBox> textBox = std::make_unique<TextBox>("", 0.1f);
-    Player *player = new Player(sf::Vector2f(500, 384));
+    Player *player = new Player(sf::Vector2f(500, 384),gameOver);
     PacMan *twoPac = new PacMan(sf::Vector2f(-107, 384));
     Idk *wtf = new Idk(sf::Vector2f(300, 300), 200);
     Npc *npc = new Npc(sf::Vector2f(1300, 300), textBox.get());
@@ -66,7 +67,7 @@ int main()
         case GameState::Menu:
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left && menu.isPlayButtonClicked())
             {
-                resetGame(boss, player, twoPac, wtf, npc, inventory, window, map, textBox);
+                resetGame(boss, player, twoPac, wtf, npc, inventory, window, map, textBox,gameOver);
                 currentState = GameState::CutScene;
                 clock.restart();
             }
@@ -81,10 +82,10 @@ int main()
             cutScene.draw(window);
             break;
         case GameState::Playing:
-            if (boss->gameOver == true)
+            if (gameOver == true)
             {
                 currentState = GameState::GameOver;
-                boss->gameOver = false;
+                gameOver = false;
             }
             else
             {
