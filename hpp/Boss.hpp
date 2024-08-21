@@ -5,8 +5,6 @@ public:
     Boss(const std::string& imagePath, sf::Vector2u windowSize);
     void update(float deltaTime, Map& map, const sf::Vector2u& screenres, sf::FloatRect playerBounds) override;
     void draw(sf::RenderWindow& window);
-     void moveToLocationWithSpin(const sf::Vector2f& targetLocation, float spinSpeed, float moveSpeed);
-     void moveRandomlyOnXAxis(float minX, float maxX);
     void resetTimers();
     ~Boss();
     bool gameOver;
@@ -17,7 +15,6 @@ private:
     sf::Sprite sprite;
     sf::Sprite eyesprite;
     sf::Vector2f velocity;
-    float bounceSpeed;
     float targetWidth;
     sf::Vector2u windowSize;
     std::vector<Attack*> attacks;
@@ -28,9 +25,4 @@ private:
 
     void loadAndScaleImage(const std::string& imagePath);
     void setInitialPosition();
-
-    sf::Vector2f targetLocation;
-    bool isMovingToTarget;
-    float spinSpeed;
-    float moveSpeed;
 };
