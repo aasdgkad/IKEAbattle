@@ -105,14 +105,14 @@ void Player::manageCollisions(const std::vector<sf::FloatRect> &objectBounds)
                      switch (collision.side)
                      {
                      case CollisionSide::Left:
-                            if (!(obstacle.top > playerBounds.top && obstacle.top - playerBounds.top > 5&&velocity.y>=0))//in case of stairs
+                            if (!(obstacle.top > playerBounds.top && obstacle.top - playerBounds.top > 27&&velocity.y>=0))//in case of stairs
                             {
                                    position.x = obstacle.left - playerBounds.width;
                                    velocity.x = 0;
                             }
                             break;
                      case CollisionSide::Right:
-                            if (!(obstacle.top > playerBounds.top && obstacle.top - playerBounds.top > 5&&velocity.y>=0))
+                            if (!(obstacle.top > playerBounds.top && obstacle.top - playerBounds.top > 27&&velocity.y>=0))
                             {
                                    position.x = obstacle.left + obstacle.width;
                                    velocity.x = 0;
