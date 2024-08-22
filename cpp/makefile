@@ -2,7 +2,7 @@
 CXX = g++ -g
 
 # Project Name
-TARGET = cpp/a
+TARGET = ikea
 
 # Directories
 INCLUDE_DIR = D:\ikeaBattle\SFML-2.6.1\include
@@ -11,7 +11,7 @@ FREETYPE_INCLUDE = D:\ikeaBattle\freeType\freetype-2.13.3\include
 FREETYPE_LIB = D:\path\to\freetype\lib
 
 # Source Files
-SRC = cpp/map.cpp cpp/leveleditor.cpp
+SRC = main.cpp player.cpp CutScene.cpp map.cpp Boss.cpp Animation.cpp CollisionDetector.cpp Entity.cpp idk.cpp attack.cpp PacMan.cpp Menu.cpp GameOverScreen.cpp inventory.cpp item.cpp npc.cpp TextBox.cpp
 
 # Object Files
 OBJ = $(SRC:.cpp=.o)
