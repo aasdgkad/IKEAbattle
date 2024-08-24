@@ -1,39 +1,56 @@
 #include "../hpp/libs.hpp"
 
-Map::TextureMenu::TextureMenu(const std::vector<std::string> &texturePaths, sf::RenderWindow &window)
-    : selectedIndex(0), window(window)
-{
-    for (const auto &path : texturePaths)
+Map::TextureMenu::TextureMenu(const std::vector<std::string>& texturePaths, sf::RenderWindow& window)
+        : selectedIndex(0), window(window)
     {
-        textures.emplace_back();
-        textures.back().loadFromFile(path);
+        for (const auto& path : texturePaths)
+        {
+            sf::Texture tex;
+            if (tex.loadFromFile(path))
+            {
+                textures.push_back(std::move(tex));
+                textureNames.push_back(getFileNameWithoutExtension(path));
+            }
+        }
+        if (!textures.empty())
+        {
+            selectedTexture.setTexture(textures[selectedIndex]);
+        }
+        //selectedTexture.setColor(sf::Color::Magenta);
+        //selectedTexture.setOutlineThickness(4.0f);
     }
-    selectedTexture.setTexture(textures[selectedIndex]);
-     selectedTexture.setColor(sf::Color::Magenta);
-     //selectedTexture.setOutlineThickness(4.0f);
-}
 
 void Map::TextureMenu::draw()
 {
     if (isOpen)
-    {
-        for (int i = 0; i < textures.size(); i++)
         {
-            sf::Sprite sprite(textures[i]);
-            sprite.setPosition(50.0f + i * 100.0f, 50.0f);
-            if (i == selectedIndex)
-            {
-                selectedTexture.setPosition(sprite.getPosition());
-                window.draw(selectedTexture);
-            }
-            else
-            {
-                window.draw(sprite);
-            }
-        }
-    }
-}
+            // Save the current view
+        sf::View originalView = window.getView();
 
+        // Reset the view to the default (window coordinates)
+        window.setView(window.getDefaultView());
+            for (size_t i = 0; i < textures.size(); i++)
+            {
+                sf::Sprite sprite(textures[i]);
+                sprite.setPosition(50.0f + i * 100.0f, 50.0f);
+                sprite.setScale(64.0f / sprite.getTexture()->getSize().x, 64.0f / sprite.getTexture()->getSize().y);
+                window.draw(sprite);
+
+                if (i == selectedIndex)
+                {
+                    sf::RectangleShape highlight;
+                    highlight.setSize(sf::Vector2f(64, 64));
+                    highlight.setPosition(sprite.getPosition());
+                    highlight.setFillColor(sf::Color::Transparent);
+                    highlight.setOutlineColor(sf::Color::Magenta);
+                    highlight.setOutlineThickness(4.0f);
+                    window.draw(highlight);
+                }
+            }
+            // Restore the original view
+        window.setView(originalView);
+        }
+}
 void Map::TextureMenu::selectNext()
 {
     selectedIndex = (selectedIndex + 1) % textures.size();
@@ -48,19 +65,20 @@ void Map::TextureMenu::selectPrevious()
 
 Map::Object::Object(int x, int y, int w, int h, std::string tname) : rect(sf::Vector2f(w, h))
 {
-    // In case the texture will not load then the program will throw an exception
     assert(this->tex.loadFromFile(tname));
-    this->tex.setRepeated(true); // Enable texture repeating
+    this->tex.setRepeated(true);
 
-    // Initializing the rectangle shape
     this->rect.setTexture(&this->tex);
-    this->rect.setTextureRect(sf::IntRect(0, 0, w, h)); // Texture repeated over 400x300 area
+    this->rect.setTextureRect(sf::IntRect(0, 0, w, h));
     this->rect.setPosition(x, y);
 
-    // Setting the texture ID by removing the path prefix and the suffix .png and turning what is left to a number
-    tname = tname.substr(tname.length() - 5, 5);
-    tname.erase(tname.length() - 4);
-    this->texid = std::stoi(tname);
+    // Extract filename without path and extension
+    size_t lastSlash = tname.find_last_of("/\\");
+    size_t lastDot = tname.find_last_of(".");
+    if (lastSlash == std::string::npos) lastSlash = 0;
+    else lastSlash++;
+    if (lastDot == std::string::npos || lastDot < lastSlash) lastDot = tname.length();
+    this->texid = tname.substr(lastSlash, lastDot - lastSlash);
 }
 const sf::Texture* Map::getSelectedTexture() const
 {
@@ -116,14 +134,14 @@ int Map::getSelectedTextureIndex() const
 }
 Map::Map(sf::RenderWindow& wndref) 
     : mx(0), my(0), np(1), wndref(wndref), 
-      textureMenu({"../imgs/0.png", "../imgs/1.png", "../imgs/2.png"}, wndref)
+      textureMenu({"../imgs/wow.png", "../imgs/woow.png", "../imgs/wooow.png", "../imgs/woooow.png"}, wndref)
 {
     this->view.setSize(wndref.getSize().x, wndref.getSize().y);
 }
 
 Map::Map(std::string fname, sf::RenderWindow& wndref)
     : mx(0), my(0), np(1), wndref(wndref), 
-      textureMenu({"../imgs/0.png", "../imgs/1.png", "../imgs/2.png"}, wndref)
+      textureMenu({"../imgs/wow.png", "../imgs/woow.png", "../imgs/wooow.png", "../imgs/woooow.png"}, wndref)
 {
     this->view.setSize(wndref.getSize().x, wndref.getSize().y);
     if (std::filesystem::exists(fname))
@@ -139,16 +157,19 @@ Map::Map(std::string fname, sf::RenderWindow& wndref)
             file.read((char *)&cmy, sizeof(int));
             file.read((char *)&ssize, sizeof(int));
             for (int i = 0; i < ssize; i++)
-            {
-                int cx, cy, cw, ch, tid;
-                file.read((char *)&cx, sizeof(int));
-                file.read((char *)&cy, sizeof(int));
-                file.read((char *)&cw, sizeof(int));
-                file.read((char *)&ch, sizeof(int));
-                file.read((char *)&tid, sizeof(int));
+    {
+        int cx, cy, cw, ch, nameLength;
+        file.read((char *)&cx, sizeof(int));
+        file.read((char *)&cy, sizeof(int));
+        file.read((char *)&cw, sizeof(int));
+        file.read((char *)&ch, sizeof(int));
+        file.read((char *)&nameLength, sizeof(int));
+        
+        std::string texName(nameLength, '\0');
+        file.read(&texName[0], nameLength);
 
-                this->obj[cmx][cmy].push_back(new Object(cx, cy, cw, ch, "../imgs/" + std::to_string(tid) + ".png"));
-            }
+        this->obj[cmx][cmy].push_back(new Object(cx, cy, cw, ch, "../imgs/" + texName + ".png"));
+    }
         }
     }
 }
@@ -161,12 +182,12 @@ void Map::draw()
     }
 }
 
-void Map::addObject(int x, int y, int w, int h, std::string tname)
+void Map::addObject(int x, int y, int w, int h)
 {
+    std::string textureName = textureMenu.textureNames[textureMenu.selectedIndex];
     int wx = this->wndref.getSize().x, wy = this->wndref.getSize().y;
-    this->obj[mx][my].push_back(new Object(x + wx * mx, y + wy * my, w, h, tname));
+    this->obj[mx][my].push_back(new Object(x + wx * mx, y + wy * my, w, h, "../imgs/" + textureName + ".png"));
 }
-
 void Map::removeObject(int index)
 {
     this->obj[mx][my].erase(this->obj[mx][my].begin() + index);
@@ -191,18 +212,21 @@ void Map::saveToFile(std::string fname)
             file.write((char *)&y.first, sizeof(int));
             file.write((char *)&ssize, sizeof(int));
             for (int i = 0; i < ssize; i++)
-            {
-                // The only reason I am doing this btw is because sf::RectangleShape returns floats when my object uses integers ;)
-                int cx = this->obj[x.first][y.first][i]->rect.getPosition().x;
-                int cy = this->obj[x.first][y.first][i]->rect.getPosition().y;
-                int cw = this->obj[x.first][y.first][i]->rect.getSize().x;
-                int ch = this->obj[x.first][y.first][i]->rect.getSize().y;
-                file.write((char *)&cx, sizeof(int));
-                file.write((char *)&cy, sizeof(int));
-                file.write((char *)&cw, sizeof(int));
-                file.write((char *)&ch, sizeof(int));
-                file.write((char *)&this->obj[x.first][y.first][i]->texid, sizeof(unsigned int));
-            }
+    {
+        int cx = this->obj[x.first][y.first][i]->rect.getPosition().x;
+        int cy = this->obj[x.first][y.first][i]->rect.getPosition().y;
+        int cw = this->obj[x.first][y.first][i]->rect.getSize().x;
+        int ch = this->obj[x.first][y.first][i]->rect.getSize().y;
+        file.write((char *)&cx, sizeof(int));
+        file.write((char *)&cy, sizeof(int));
+        file.write((char *)&cw, sizeof(int));
+        file.write((char *)&ch, sizeof(int));
+        
+        // Write the length of the string first, then the string itself
+        int nameLength = this->obj[x.first][y.first][i]->texid.length();
+        file.write((char *)&nameLength, sizeof(int));
+        file.write(this->obj[x.first][y.first][i]->texid.c_str(), nameLength);
+    }
         }
     }
 }

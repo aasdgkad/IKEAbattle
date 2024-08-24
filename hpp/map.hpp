@@ -14,7 +14,7 @@ private:
 
         sf::RectangleShape rect; // Rectangle that holds a reference to the texture
         sf::Texture tex;         // The texture in quexture
-        unsigned int texid;      // I know it looks redundant but I need it in order to transfer it to a file
+        std::string texid;      // I know it looks redundant but I need it in order to transfer it to a file
     };
 
 public:
@@ -30,7 +30,17 @@ public:
         int selectedIndex;
 
         std::vector<sf::Texture> textures;
+    std::vector<std::string> textureNames;
     private:
+    std::string getFileNameWithoutExtension(const std::string& path)
+    {
+        size_t lastSlash = path.find_last_of("/\\");
+        size_t lastDot = path.find_last_of(".");
+        if (lastSlash == std::string::npos) lastSlash = 0;
+        else lastSlash++;
+        if (lastDot == std::string::npos || lastDot < lastSlash) lastDot = path.length();
+        return path.substr(lastSlash, lastDot - lastSlash);
+    }
         sf::RenderWindow &window;
     };
 
@@ -43,7 +53,7 @@ public:
     ~Map();
 
     void draw();                                                   // A function that draws the map
-    void addObject(int x, int y, int w, int h, std::string tname); // A function that adds an object to the map
+    void addObject(int x, int y, int w, int h); // A function that adds an object to the map
     void removeObject(int index);                                  // A function that removes an object from the current part
     void saveToFile(std::string fname);                            // A function that saves the map to a file (used by the level editor)
     void changePart(int x, int y);                                 // It changes the part relative to the current one

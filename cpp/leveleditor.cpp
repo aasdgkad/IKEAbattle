@@ -16,6 +16,7 @@ int main()
 
     while (window.isOpen())
     {
+        window.setFramerateLimit(60);
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -29,12 +30,10 @@ int main()
                 }
                 else if (event.key.code == sf::Keyboard::Up)
                 {
-                    map.selectPreviousTexture();
                     transrect.setTexture(map.getSelectedTexture());
                 }
                 else if (event.key.code == sf::Keyboard::Down)
                 {
-                    map.selectNextTexture();
                     transrect.setTexture(map.getSelectedTexture());
                 }
             }
@@ -67,9 +66,7 @@ int main()
         }
         else if (lc)
         {
-            map.addObject(std::min(sc.x, fc.x), std::min(sc.y, fc.y), std::abs(sc.x - fc.x), std::abs(sc.y - fc.y), 
-                          "../imgs/" + std::to_string(map.getSelectedTextureIndex()) + ".png");
-            fc = sf::Vector2i(0, 0);
+            map.addObject(std::min(sc.x, fc.x), std::min(sc.y, fc.y), std::abs(sc.x - fc.x), std::abs(sc.y - fc.y));
             sc = sf::Vector2i(0, 0);
             transrect.setSize(sf::Vector2f(0, 0));
             lc = 0;
