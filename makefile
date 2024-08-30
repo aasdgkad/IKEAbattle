@@ -2,7 +2,7 @@
 CXX = g++ -g
 
 # Project Name
-TARGET = cpp/a
+TARGET = cpp/levelEditor
 
 # Directories
 INCLUDE_DIR = D:\ikeaBattle\SFML-2.6.1\include
@@ -10,8 +10,11 @@ LIB_DIR = D:\ikeaBattle\SFML-2.6.1\lib
 FREETYPE_INCLUDE = D:\ikeaBattle\freeType\freetype-2.13.3\include
 FREETYPE_LIB = D:\path\to\freetype\lib
 
-# Source Files
-SRC = cpp/map.cpp cpp/leveleditor.cpp
+# Source Files without the "cpp/" prefix
+SRC_FILES = map.cpp leveleditor.cpp Boss.cpp npc.cpp Menu.cpp item.cpp inventory.cpp attack.cpp idk.cpp Entity.cpp Animation.cpp GameOverScreen.cpp TextBox.cpp PacMan.cpp CollisionDetector.cpp Player.cpp CutScene.cpp EntityFactory.cpp
+
+# Add the "cpp/" prefix to each source file
+SRC = $(addprefix cpp/,$(SRC_FILES))
 
 # Object Files
 OBJ = $(SRC:.cpp=.o)

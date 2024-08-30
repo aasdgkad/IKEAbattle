@@ -7,9 +7,13 @@
 #include <unordered_map>
 #include <cassert>
 #include <filesystem>
+#include <memory>
+#include <functional>
+#include <unordered_map>
 #include <iostream>//only used for debugging can be removed
 #include <fstream>
 #include <random>
+#include "EntityFactory.hpp"
 #include "map.hpp"
 #include "CutScene.hpp"
 #include "Animation.hpp"
