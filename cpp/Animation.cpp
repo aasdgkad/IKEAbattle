@@ -1,10 +1,9 @@
 #include "../hpp/libs.hpp"
 
 Animation::Animation()
-    : currentFrame(0), frameTime(0), frameInterval(0.1f), isFacingRight(true)
+    : currentFrame(0), frameTime(0), frameInterval(0.1f), isFacingRight(true),paused(false)
 {
 }
-
 void Animation::loadSpritesheet(const std::string& filename, int cellWidth, int cellHeight)
 {
     spritesheet.loadFromFile(filename);

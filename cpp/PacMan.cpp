@@ -7,9 +7,6 @@ PacMan::PacMan(sf::Vector2f spawnPosition)
     loadSprite();
 }
 
-PacMan::~PacMan()
-{
-}
 
 void PacMan::loadSprite()
 {

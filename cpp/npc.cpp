@@ -1,8 +1,9 @@
 #include "../hpp/libs.hpp"
-
-Npc::Npc(sf::Vector2f position, TextBox *textBox)
-    : Entity(), gravity(980.0f), textBox(textBox), isColliding(false)
+class TextBox; 
+Npc::Npc(sf::Vector2f position)
+    : Entity(), gravity(980.0f), isColliding(false)
 {
+       textBox = std::make_unique<TextBox>("", 0.007f);
        setPosition(position);
        loadSprite();
 }
@@ -35,6 +36,7 @@ void Npc::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf::F
 void Npc::draw(sf::RenderWindow &window)
 {
        window.draw(getSprite());
+       textBox->draw(window);
 }
 
 void Npc::checkCollisionWithPlayer(const sf::FloatRect &playerBounds)
