@@ -1,1 +1,1 @@
-g++ main.cpp player.cpp CutScene.cpp map.cpp Boss.cpp Entity.cpp Animation.cpp idk.cpp CollisionDetector.cpp attack.cpp PacMan.cpp Menu.cpp GameOverScreen.cpp inventory.cpp item.cpp -o main -lsfml-graphics -lsfml-window -lsfml-system
+g++ main.cpp player.cpp CutScene.cpp map.cpp Boss.cpp Entity.cpp Animation.cpp idk.cpp CollisionDetector.cpp attack.cpp PacMan.cpp Menu.cpp GameOverScreen.cpp inventory.cpp item.cpp EntityFactory.cpp npc.cpp TextBox.cpp  -o main -lsfml-graphics -lsfml-window -lsfml-system

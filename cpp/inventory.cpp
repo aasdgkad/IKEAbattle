@@ -19,6 +19,12 @@ Inventory::Inventory(Map &map, Player* player, sf::RenderWindow& window) : pgcou
     this->selectedItemS.setPosition(this->selectedSquare.getPosition());
 
     this->allItems.push_back(new HB());
+    this->allItems.push_back(new RP());
+    this->allItems.push_back(new GB());
+
+    for(int i = 0; i < allItems.size(); i++){
+        unownedItems.push_back(i);
+    }
 
     this->text.setFont(this->font);
     this->text.setCharacterSize(12);
@@ -28,11 +34,18 @@ Inventory::Inventory(Map &map, Player* player, sf::RenderWindow& window) : pgcou
 void Inventory::update()
 {
     // Take care of item behavior
-    for(int i = 0; i < this->allItems.size(); i++){
-        if(this->allItems[i]->update(playerr)){
+    for(int j = 0; j < this->unownedItems.size(); j++){
+        int i = unownedItems[j];
+        if(this->allItems[i]->updateU(playerr)){
             this->allItems[i]->sprite.setScale(cellSprite[0].getGlobalBounds().width/allItems[i]->sprite.getGlobalBounds().width, cellSprite[0].getGlobalBounds().height/allItems[i]->sprite.getGlobalBounds().height);
             this->ownedItems.push_back(i);
+            this->unownedItems.erase(unownedItems.begin()+j);
+            break;
         }
+    }
+    for(int j = 0; j < this->ownedItems.size(); j++){
+        int i = ownedItems[j];
+        this->allItems[i]->updateO(playerr);
     }
 
     // Check if e is pressed so you can determine wether the inventory should be drawn or not
@@ -41,6 +54,8 @@ void Inventory::update()
         if (fc)
         {
             shouldDraw = !shouldDraw;
+            if(!shouldDraw)
+                selectedItem = -1;
             fc = false;
         }
     }
@@ -55,22 +70,22 @@ void Inventory::update()
         for(int i = 0; i < ownedItems.size(); i++){
             if(allItems[ownedItems[i]]->sprite.getGlobalBounds().contains(mp.x, mp.y)){
                 selectedItem = ownedItems[i];
-                selectedItemS.setTexture(allItems[selectedItem]->texture);
+                selectedItemS.setTexture(allItems[selectedItem]->texture, true);
                 selectedItemS.setScale(allItems[selectedItem]->sprite.getScale());
                 std::string displaytext = allItems[selectedItem]->name + "\n";
                 int fds = (allItems[selectedItem]->speedb - 1.0f)*100;
-                if(fds > 0){
+                if(fds != 0){
                     displaytext += std::to_string(fds) + "% speed\n";
                 }
                 int fdj = (allItems[selectedItem]->jumpb - 1.0f)*100;
-                if(fdj > 0){
+                if(fdj != 0){
                     displaytext += std::to_string(fdj) + "% jump\n";
                 }
                 int fdsi = (allItems[selectedItem]->sizet - 1.0f)*100;
-                if(fdsi > 0){
+                if(fdsi != 0){
                     displaytext += std::to_string(fdsi) + "% size\n";
                 }
-                displaytext += allItems[selectedItem]->description;
+                displaytext += allItems[selectedItem]->description + "\n" + allItems[selectedItem]->customText();
                 text.setString(displaytext);
                 break;
             }
@@ -81,10 +96,8 @@ void Inventory::update()
 void Inventory::draw()
 {
     // Draw the items that are actually not related to the inventory at all
-    for(int i = 0; i < allItems.size(); i++){
-        if(!allItems[i]->owned){
-            allItems[i]->draw(windowr);
-        }
+    for(int i = 0; i < unownedItems.size(); i++){
+        allItems[unownedItems[i]]->draw(windowr);
     }
 
     // Draw the inventory normally
@@ -130,4 +143,8 @@ void Inventory::reset(Player* player)
     this->shouldDraw = false;
     this->fc = true;
     this->ownedItems.clear();
+    this->unownedItems.clear();
+    for(int i = 0; i < allItems.size(); i++){
+        unownedItems.push_back(i);
+    }
 }

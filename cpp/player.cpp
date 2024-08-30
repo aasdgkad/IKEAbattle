@@ -10,6 +10,8 @@ Player::Player(sf::Vector2f position,bool &gameoverr) : Entity(), gameover(&game
        jumpForce = -700.0f;
        moveSpeed = 200.0f;
        isGrounded = false;
+       onehitinvin = false;
+       gothitinv = false;
 }
 
 void Player::loadAnimations()
