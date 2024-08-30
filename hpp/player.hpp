@@ -22,4 +22,7 @@ bool *gameover;
     float moveSpeed;
     bool isGrounded;
     void loadAnimations();
+
+    //some item and attack related bullshit
+    bool onehitinvin, gothitinv;
 };

@@ -14,7 +14,7 @@ class Inventory{
     sf::Texture bpTex, cellTex;
     sf::Sprite bpSprite, cellSprite[40], selectedSquare, selectedItemS;
     std::vector<Item*> allItems;
-    std::vector<int> ownedItems;
+    std::vector<int> ownedItems, unownedItems;
     int selectedItem, pgcount;
     bool shouldDraw, fc;
     Map &mapr;
