@@ -511,6 +511,7 @@ std::vector<sf::FloatRect> Map::getObjectBounds()
     }
     return bounds;
 }
+
 void Map::removeEntity(int index)
 {
     if (index >= 0 && index < placedEntities.size())
@@ -555,13 +556,32 @@ void Map::spawnEntities() {
         }
     }
 }
-   void Map::updateEntities(float deltaTime, const sf::Vector2u& windowSize,sf::FloatRect playerBounds) {
-        for (auto& entity : activeEntities) {
-            entity->update(deltaTime, *this, windowSize,playerBounds);
-        }
+void Map::updateEntities(float deltaTime, const sf::Vector2u &windowSize, sf::FloatRect playerBounds)
+{
+    for (auto &entity : activeEntities)
+    {
+        entity->update(deltaTime, *this, windowSize, playerBounds);
     }
+    removeDeadEntities();
+}
     void Map::drawEntities(sf::RenderWindow& window) {
         for (auto& entity : activeEntities) {
             entity->draw(window);
         }
     }
+
+void Map::removeDeadEntities()
+{
+    activeEntities.erase(
+        std::remove_if(activeEntities.begin(), activeEntities.end(),
+                       [](Entity *entity)
+                       {
+                           if (entity->shouldBeDead)
+                           {
+                               delete entity;
+                               return true;
+                           }
+                           return false;
+                       }),
+        activeEntities.end());
+}

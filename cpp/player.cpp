@@ -4,6 +4,7 @@
 Player::Player(sf::Vector2f position,bool &gameoverr) : Entity(), gameover(&gameoverr)
 {
        loadAnimations();
+       loadShaders();
        setPosition(position);
 
        gravity = 980.0f;
@@ -12,6 +13,7 @@ Player::Player(sf::Vector2f position,bool &gameoverr) : Entity(), gameover(&game
        isGrounded = false;
        onehitinvin = false;
        gothitinv = false;
+       isStasis = false;
 }
 
 void Player::loadAnimations()
@@ -21,6 +23,11 @@ void Player::loadAnimations()
        addAnimation("running", 1, 6);
        addAnimation("jumping", 2, 3);
        setAnimation("idle");
+}
+
+void Player::loadShaders(){
+       assert(this->stasishad.loadFromFile("../shaders/stasis.frag", sf::Shader::Fragment));
+       this->stasishad.setUniform("texture", sf::Shader::CurrentTexture);
 }
 
 void Player::handleInput()
@@ -79,22 +86,29 @@ void Player::updateAnimation()
 
 void Player::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf::FloatRect playerBounds)
 {
-       if(velocity.y>5777){
-              (*gameover)=true;
+       if(!isStasis){
+              if(velocity.y>5777){
+                     (*gameover)=true;
+              }
+              handleInput();
+              velocity.y += gravity * deltaTime;
+              position += velocity * deltaTime;
+              setPosition(position);
+              manageCollisions(map.getObjectBounds());
+              checkBounds(screenres, map);
+              updateAnimation();
+              Animation::update(deltaTime);
        }
-       handleInput();
-       velocity.y += gravity * deltaTime;
-       position += velocity * deltaTime;
-       setPosition(position);
-       manageCollisions(map.getObjectBounds());
-       checkBounds(screenres, map);
-       updateAnimation();
-       Animation::update(deltaTime);
 }
 
 void Player::draw(sf::RenderWindow &window)
 {
-       window.draw(sprite);
+       if(isStasis){
+              window.draw(sprite, &stasishad);
+       }
+       else{
+              window.draw(sprite);
+       }
 }
 
 void Player::manageCollisions(const std::vector<sf::FloatRect> &objectBounds)

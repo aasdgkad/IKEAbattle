@@ -22,7 +22,9 @@ bool *gameover;
     float moveSpeed;
     bool isGrounded;
     void loadAnimations();
+    void loadShaders();
 
     //some item and attack related bullshit
-    bool onehitinvin, gothitinv;
+    bool onehitinvin, gothitinv, isStasis;
+    sf::Shader stasishad;
 };

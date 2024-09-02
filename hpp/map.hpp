@@ -116,6 +116,7 @@ public:
     void updateEntities(float deltaTime, const sf::Vector2u& windowSize,sf::FloatRect playerBounds);
 
     void drawEntities(sf::RenderWindow& window);
+    void removeDeadEntities();
 
 private:
 std::unordered_map<std::string, sf::Texture> entityTextures;

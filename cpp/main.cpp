@@ -22,7 +22,7 @@ void resetGame(Map &map,Player *&player, Inventory &inventory, sf::RenderWindow 
 int main()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(sf::VideoMode(1024, 768), "SFML Player", sf::Style::Default);
+    sf::RenderWindow window(sf::VideoMode(1024, 768), "SFML Player", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
 
     std::vector<std::string> cutSceneImages = {
