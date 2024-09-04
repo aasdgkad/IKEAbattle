@@ -6,8 +6,9 @@ class Player : public Entity {
     friend class Item;
 public:
     Player(sf::Vector2f position,bool&gameover);
-    void update(float deltaTime, Map& map, const sf::Vector2u& screenres, sf::FloatRect playerBounds = sf::FloatRect()) override;
+    void update(float deltaTime, Map& map, const sf::Vector2u& screenres) override;
     sf::FloatRect getBounds();
+    sf::FloatRect place;
     void draw(sf::RenderWindow& window) override;
 
 private:

@@ -15,7 +15,7 @@ void Npc::loadSprite()
        setAnimation("idle");
 }
 
-void Npc::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf::FloatRect playerBounds)
+void Npc::update(float deltaTime, Map &map, const sf::Vector2u &screenres)
 {
        if (isOnScreen(map.getPartBounds()))
        {
@@ -23,7 +23,7 @@ void Npc::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf::F
               position.y += velocity.y * deltaTime;
               getSprite().setPosition(position);
               manageCollisions(map.getObjectBounds());
-              checkCollisionWithPlayer(playerBounds);
+              checkCollisionWithPlayer(*playerBounds);
               Animation::update(deltaTime);
 
               if (textBox)
@@ -48,7 +48,7 @@ void Npc::checkCollisionWithPlayer(const sf::FloatRect &playerBounds)
               {
                      if (textBox)
                      {
-                            textBox->setString("Marijuana Cocaina \nHeroina Crack");
+                            textBox->setString(text);
                      }
                      isColliding = true;
               }
@@ -89,3 +89,14 @@ void Npc::manageCollisions(const std::vector<sf::FloatRect> &objectBounds)
               }
        }
 }
+std::vector<std::pair<std::string, std::string>> Npc::getEditableProperties() const {
+        return {
+            {"text", text}
+        };
+    }
+
+    void Npc::setProperty(const std::string& text, const std::string& value) {
+        if (text == "text") {
+            this->text = value;
+        }
+    }

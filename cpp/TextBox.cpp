@@ -7,6 +7,7 @@ TextBox::TextBox(const std::string& text, float letterDelay)
     background.setOutlineColor(sf::Color::Black);
     background.setOutlineThickness(2.0f);
     font.loadFromFile("../fonts/ARIAL.TTF"); // Replace with the actual path to your font file
+    setCharacterImage("../imgs/hammer.jpg");
     visibleContent.setFont(font);
     visibleContent.setString(text);
     visibleContent.setFillColor(sf::Color::Black);
@@ -81,9 +82,9 @@ void TextBox::setCharacterImage(const std::string& imagePath)
         characterSprite.setTexture(characterTexture);
         
         // Scale the sprite to fit the height of the text box
-        float scale = 70.0f / characterSprite.getLocalBounds().height;
-        characterSprite.setScale(scale, scale);
-
+         float scaley = 70.0f / characterSprite.getLocalBounds().height;
+        float scalex = 70.0f / characterSprite.getLocalBounds().width;
+        characterSprite.setScale(scalex, scaley);
         hasCharacterImage = true;
     }
     else

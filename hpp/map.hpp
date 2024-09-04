@@ -5,6 +5,7 @@ class EntityFactory;
 class TextBox;
 class Map
 {
+
 private:
     class Object
     {
@@ -68,18 +69,19 @@ public:
     };
 
 public:
+    bool *gameOver;
     std::vector<sf::FloatRect> getObjectBounds();
-    Map(sf::RenderWindow &wndref);
-    Map(std::string fname, sf::RenderWindow &wndref); // used to load the map from a file
-    Map(const Map &) = delete;                        // Copy constructor is not needed
-    Map &operator=(const Map &) = delete;             // Copy assignment operator is not needed
+    Map(sf::RenderWindow &wndref, bool &gameover);
+    Map(std::string fname, sf::RenderWindow &wndref, bool &gameover); // used to load the map from a file
+    Map(const Map &) = delete;                                        // Copy constructor is not needed
+    Map &operator=(const Map &) = delete;                             // Copy assignment operator is not needed
     ~Map();
 
     void draw();                                // A function that draws the map
     void addObject(int x, int y, int w, int h); // A function that adds an object to the map
     void removeObject(int index);               // A function that removes an object from the current part
     void saveToFile(std::string fname);         // A function that saves the map to a file (used by the level editor)
-    void changePart(int x, int y);              // It changes the part relative to the current one
+    void changePart(int x, int y); // It changes the part relative to the current one
     sf::FloatRect getPartBounds();
     TextureMenu textureMenu;
     void drawTextureMenu();
@@ -99,32 +101,62 @@ public:
     void selectNextEntity();
     void selectPreviousEntity();
     int getSelectedEntityIndex() const;
-    const sf::Sprite &getSelectedEntitySprite() const;
     bool isEntityMenuOpen() const;
     void removeEntity(int x, int y);
     std::vector<sf::FloatRect> getEntityBounds();
 
+    struct PlacedEntity
+    {
+        sf::Sprite sprite;
+        std::string type;
+        std::unique_ptr<Entity> entity;
+    };
     void removeEntity(int index);
+    void drawEditorEntities(sf::RenderWindow &window,Map::PlacedEntity *selectedEntity,bool isOpen);
+    const sf::Texture *getEntityTexture(const std::string &entityName) const;
+    std::vector<Entity *> activeEntities;
+    void resetEntities(sf::FloatRect &playerBounds);
+    void spawnEntities(sf::FloatRect &playerBounds);
+
+    void updateEntities(float deltaTime, const sf::Vector2u &windowSize);
+
+    void drawEntities(sf::RenderWindow &window);
+
+    std::vector<PlacedEntity> placedEntities;
+
     void addEntity(int x, int y, const std::string &entityType);
-    void drawEditorEntities(sf::RenderWindow& window);
-    const sf::Texture* getEntityTexture(const std::string& entityName) const;
-    std::vector<std::pair<sf::Sprite, std::string>> placedEntities;
-    std::vector<Entity*> activeEntities;
-    void resetEntities();
-     void spawnEntities();
-
-    void updateEntities(float deltaTime, const sf::Vector2u& windowSize,sf::FloatRect playerBounds);
-
-    void drawEntities(sf::RenderWindow& window);
-    void removeDeadEntities();
 
 private:
-std::unordered_map<std::string, sf::Texture> entityTextures;
+    std::vector<std::map<std::string, std::string>> entityProperties;
+    static std::unordered_map<std::string, sf::Texture> entityTextures;
     std::unordered_map<int, std::unordered_map<int, std::vector<Object *>>> obj; // It used to be a vector with pointers to the actual objects contained by the map
     std::unordered_map<int, std::unordered_map<int, std::vector<std::pair<std::string, sf::Vector2f>>>> entities;
     int mx, my, np;
     sf::View view;
     sf::RenderWindow &wndref;
-    
-    // std::vector<Object*> obj;// A vector with pointers to the actual objects contained by the map
+    void removeDeadEntities();
+
+public:
+    class PropertyEditor
+    {
+    public:
+        sf::RectangleShape background;
+        std::vector<sf::Text> labels;
+        std::vector<sf::RectangleShape> inputBoxes;
+        std::vector<sf::Text> inputTexts;
+        Map::PlacedEntity *selectedEntity = nullptr;
+        int selectedInputBox;
+        bool isOpen = false;
+        sf::Font *font; // Store font pointer
+
+        void setup(sf::Font &loadedFont);
+
+        void updateForEntity(Map::PlacedEntity *entity, sf::Font &font);
+
+        void draw(sf::RenderWindow &window);
+
+        void handleInput(sf::Event &event, sf::RenderWindow &window);
+
+        void applyChanges();
+    };
 };

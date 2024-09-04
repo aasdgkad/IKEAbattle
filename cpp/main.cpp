@@ -13,8 +13,8 @@ enum class GameState
 
 void resetGame(Map &map,Player *&player, Inventory &inventory, sf::RenderWindow &window, bool &gameover)
 {
-    map.resetEntities();
-    player = new Player(sf::Vector2f(500, 384),gameover);
+    player = new Player(sf::Vector2f(500, 500),gameover);
+    map.resetEntities(player->place);
     inventory.reset(player);
     gameover = false;
 }
@@ -29,9 +29,9 @@ int main()
         
     };
     bool gameOver = false;
-    Player *player = new Player(sf::Vector2f(500, 384),gameOver);
+    Player *player = new Player(sf::Vector2f(500, 500),gameOver);
     CutScene cutScene(cutSceneImages, window.getSize());
-    Map map("../map.mib", window);
+    Map map("../map.mib", window,gameOver);
     GameOverScreen gameOverScreen(window);
     Menu menu(window);
     Inventory inventory(map, player, window);
@@ -80,7 +80,7 @@ int main()
             }
             else
             {
-                map.updateEntities(deltaTime, window.getSize(),player->getBounds());
+                map.updateEntities(deltaTime, window.getSize());
                 player->update(deltaTime, map, window.getSize());
                 inventory.update();
 

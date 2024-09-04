@@ -1,6 +1,6 @@
 #include "../hpp/libs.hpp"
 
-Entity::Entity() : position(0, 0), velocity(0, 0) {}
+Entity::Entity() : position(0, 0), velocity(0, 0), shouldBeDead(false) {}
 
 void Entity::setPosition(const sf::Vector2f& pos) {
     position = pos;

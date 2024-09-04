@@ -8,5 +8,5 @@ class Idk;
 
 class EntityFactory {
 public:
-    static Entity* createEntity(const std::string& type, const sf::Vector2f& position , bool* gameOver);
+    static Entity* createEntity(const std::string& type, const sf::Vector2f& position , bool& gameOver);
 };

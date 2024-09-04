@@ -8,12 +8,13 @@ Player::Player(sf::Vector2f position,bool &gameoverr) : Entity(), gameover(&game
        setPosition(position);
 
        gravity = 980.0f;
-       jumpForce = -700.0f;
+       jumpForce = -500.0f;
        moveSpeed = 200.0f;
        isGrounded = false;
        onehitinvin = false;
        gothitinv = false;
        isStasis = false;
+       place=getBounds();
 }
 
 void Player::loadAnimations()
@@ -84,7 +85,7 @@ void Player::updateAnimation()
        }
 }
 
-void Player::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf::FloatRect playerBounds)
+void Player::update(float deltaTime, Map &map, const sf::Vector2u &screenres)
 {
        if(!isStasis){
               if(velocity.y>5777){
@@ -98,6 +99,7 @@ void Player::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf
               checkBounds(screenres, map);
               updateAnimation();
               Animation::update(deltaTime);
+              place=getBounds();
        }
 }
 

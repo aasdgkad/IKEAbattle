@@ -3,8 +3,10 @@ class Map; // Forward declaration
 class Npc : public Entity {
 public:
     Npc(sf::Vector2f position);
-    void update(float deltaTime, Map& map, const sf::Vector2u& screenres, sf::FloatRect playerBounds = sf::FloatRect()) override;
+    void update(float deltaTime, Map& map, const sf::Vector2u& screenres) override;
     void draw(sf::RenderWindow& window) override;
+    std::vector<std::pair<std::string, std::string>> getEditableProperties() const override;
+     void setProperty(const std::string& name, const std::string& value) override;
     std::unique_ptr<TextBox> textBox;
 
 private:
@@ -14,4 +16,6 @@ private:
     float gravity;
     sf::RenderWindow* window;
     bool isColliding;
+    std::string customString;
+    std::string text;
 };

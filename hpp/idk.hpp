@@ -2,7 +2,7 @@
 class Idk : public Entity {
 public:
     Idk(sf::Vector2f position, float moveDistance);
-    void update(float deltaTime, Map& map, const sf::Vector2u& screenres,sf::FloatRect playerBounds = sf::FloatRect()) override;
+    void update(float deltaTime, Map& map, const sf::Vector2u& screenres) override;
     void draw(sf::RenderWindow& window) override;
     bool isOutOfBounds(const sf::Vector2u& windowSize) const;
 

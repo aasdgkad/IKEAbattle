@@ -12,7 +12,7 @@ void Idk::loadSprite()
     addAnimation("default", 0, 1);
     setAnimation("default");
 }
-void Idk::update(float deltaTime, Map &map, const sf::Vector2u &screenres, sf::FloatRect playerBounds)
+void Idk::update(float deltaTime, Map &map, const sf::Vector2u &screenres)
 {
     if (isOnScreen(map.getPartBounds()))
     {

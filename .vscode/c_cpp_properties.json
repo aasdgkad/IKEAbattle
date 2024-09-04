@@ -4,8 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "D:\\ikeaBattle\\SFML-2.6.1\\include",
-                "D:\\ikeaBattle\\SFML-2.6.1\\lib"
+                "D:\\ikeaBattle2\\SFML-2.6.1\\include",
+                "D:\\ikeaBattle2\\SFML-2.6.1\\lib"
 
             ],
             "defines": [

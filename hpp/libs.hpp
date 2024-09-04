@@ -11,6 +11,7 @@
 #include <functional>
 #include <unordered_map>
 #include <iostream>//only used for debugging can be removed
+#include <stdexcept>
 #include <fstream>
 #include <random>
 #include "EntityFactory.hpp"
