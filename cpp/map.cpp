@@ -186,26 +186,25 @@ void Map::addEntity(int x, int y, const std::string &entityType)
             placedEntities.push_back(PlacedEntity{sprite, entityType, std::move(newEntity)});
         }
     }
-    std::cout << entityTextures.size() << " ";
 }
-void Map::drawEditorEntities(sf::RenderWindow &window,Map::PlacedEntity *selectedEntity,bool isOpen)
+void Map::drawEditorEntities(sf::RenderWindow &window, Map::PlacedEntity *selectedEntity, bool &isOpen)
 {
     for (const auto &entity : placedEntities)
     {
         sf::Sprite entitySprite = entity.sprite;
-        
+
         // Check if this entity is the selected one and the property editor is open
-        if (&entity == selectedEntity&& isOpen)
+        if (&entity == selectedEntity && isOpen)
         {
             // Set the color to pink
-            entitySprite.setColor(sf::Color(255, 92, 3, 255));  // Pink color
+            entitySprite.setColor(sf::Color(255, 92, 3, 255)); // Pink color
         }
         else
         {
             // Reset to default color
             entitySprite.setColor(sf::Color::White);
         }
-        
+
         window.draw(entitySprite);
     }
 }
@@ -587,12 +586,10 @@ void Map::resetEntities(sf::FloatRect &playerBounds)
 {
     activeEntities.clear();
     spawnEntities(playerBounds);
-    std::cout << activeEntities.size() << "\n";
 }
 
 void Map::spawnEntities(sf::FloatRect &playerBounds)
 {
-    std::cout << "aaa\n";
     for (const auto &placedEntity : placedEntities)
     {
         const sf::Vector2f position = placedEntity.sprite.getPosition();

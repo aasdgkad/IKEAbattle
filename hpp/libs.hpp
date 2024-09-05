@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <vector>
 #include <unordered_map>
+#include <numbers>
 #include <cassert>
 #include <filesystem>
 #include <memory>

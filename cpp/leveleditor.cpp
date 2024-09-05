@@ -127,6 +127,8 @@ int main()
                     {
                         if (placedEntity.sprite.getGlobalBounds().contains(worldPos))
                         {
+                            map.textureMenu.isOpen=false;
+                            map.entityMenu.isOpen=false;
                             clickedEntity = &placedEntity;
                             break;
                         }

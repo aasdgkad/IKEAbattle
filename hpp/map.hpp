@@ -112,7 +112,7 @@ public:
         std::unique_ptr<Entity> entity;
     };
     void removeEntity(int index);
-    void drawEditorEntities(sf::RenderWindow &window,Map::PlacedEntity *selectedEntity,bool isOpen);
+    void drawEditorEntities(sf::RenderWindow &window,Map::PlacedEntity *selectedEntity,bool &isOpen);
     const sf::Texture *getEntityTexture(const std::string &entityName) const;
     std::vector<Entity *> activeEntities;
     void resetEntities(sf::FloatRect &playerBounds);
