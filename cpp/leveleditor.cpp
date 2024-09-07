@@ -150,6 +150,7 @@ int main()
                     else
                     {
                         sf::Vector2f entityPos = entityPreview.getPosition();
+                        std::cout<<entityPos.x<<" "<<entityPos.y<<"\n";
                         sf::Vector2f entitySize = sf::Vector2f(entityPreview.getGlobalBounds().width, entityPreview.getGlobalBounds().height);
                         map.addEntity(entityPos.x - entitySize.x / 2, entityPos.y - entitySize.y / 2, map.getSelectedEntityName());
                     }

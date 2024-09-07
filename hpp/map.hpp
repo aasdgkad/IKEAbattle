@@ -140,6 +140,9 @@ public:
     class PropertyEditor
     {
     public:
+    static const float INPUT_BOX_WIDTH;
+    static const float INPUT_BOX_HEIGHT;
+    static const float LINE_SPACING;
         sf::RectangleShape background;
         std::vector<sf::Text> labels;
         std::vector<sf::RectangleShape> inputBoxes;
@@ -158,5 +161,9 @@ public:
         void handleInput(sf::Event &event, sf::RenderWindow &window);
 
         void applyChanges();
+        void wrapText(sf::Text &text, float maxWidth);
+        float calculateRequiredHeight(const sf::Text &text, float maxWidth);
+        void adjustLayout();
+        void adjustBackgroundSize();
     };
 };

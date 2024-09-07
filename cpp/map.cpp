@@ -166,14 +166,14 @@ void Map::addEntity(int x, int y, const std::string &entityType)
 {
     int wx = this->wndref.getSize().x;
     int wy = this->wndref.getSize().y;
-    sf::Vector2f position(x + wx * mx, y + wy * my);
+    sf::Vector2f position(x , y);
 
     // Create the entity
     std::unique_ptr<Entity> newEntity(EntityFactory::createEntity(entityType, position, *gameOver));
 
     if (newEntity)
     {
-        // Add to entities map (if you still need this)
+        // Add to entities map
         entities[mx][my].push_back(std::make_pair(entityType, position));
 
         // Create sprite
@@ -645,57 +645,56 @@ void Map::removeDeadEntities()
         activeEntities.end());
 }
 void Map::PropertyEditor::applyChanges()
-{
-    if (!selectedEntity)
-        return;
-    auto properties = selectedEntity->entity->getEditableProperties();
-    for (size_t i = 0; i < properties.size() && i < inputTexts.size(); ++i)
     {
-        selectedEntity->entity->setProperty(properties[i].first, inputTexts[i].getString());
+        if (!selectedEntity)
+            return;
+        auto properties = selectedEntity->entity->getEditableProperties();
+        for (size_t i = 0; i < properties.size() && i < inputTexts.size(); ++i)
+        {
+            selectedEntity->entity->setProperty(properties[i].first, inputTexts[i].getString());
+        }
     }
-    std::cout << "Changes applied to entity properties." << std::endl;
-}
 void Map::PropertyEditor::handleInput(sf::Event &event, sf::RenderWindow &window)
-{
-    if (!isOpen || !selectedEntity)
-        return;
-
-    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
     {
-        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-        for (size_t i = 0; i < inputBoxes.size(); ++i)
+        if (!isOpen || !selectedEntity)
+            return;
+
+        if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
         {
-            if (inputBoxes[i].getGlobalBounds().contains(mousePos.x, mousePos.y))
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+            for (size_t i = 0; i < inputBoxes.size(); ++i)
             {
-                selectedInputBox = i;
-                return;
+                if (inputBoxes[i].getGlobalBounds().contains(mousePos.x, mousePos.y))
+                {
+                    selectedInputBox = i;
+                    return;
+                }
+            }
+            selectedInputBox = -1;
+        }
+        else if (event.type == sf::Event::TextEntered && selectedInputBox != -1)
+        {
+            if (event.text.unicode < 128)
+            {
+                std::string currentText = inputTexts[selectedInputBox].getString();
+                if (event.text.unicode == '\b')
+                {
+                    if (!currentText.empty())
+                        currentText.pop_back();
+                }
+                else
+                {
+                    currentText += static_cast<char>(event.text.unicode);
+                }
+                inputTexts[selectedInputBox].setString(currentText);
+                
+                // Recalculate the height of the input box and adjust layout
+                float requiredHeight = calculateRequiredHeight(inputTexts[selectedInputBox], 180);
+                inputBoxes[selectedInputBox].setSize(sf::Vector2f(180, requiredHeight));
+                adjustLayout();
             }
         }
-        selectedInputBox = -1;
     }
-    else if (event.type == sf::Event::TextEntered && selectedInputBox != -1)
-    {
-        if (event.text.unicode < 128)
-        {
-            std::string currentText = inputTexts[selectedInputBox].getString();
-            if (event.text.unicode == '\b')
-            {
-                // Handle backspace
-                if (!currentText.empty())
-                    currentText.pop_back();
-            }
-            else
-            {
-                // Append the character
-                currentText += static_cast<char>(event.text.unicode);
-            }
-            inputTexts[selectedInputBox].setString(currentText);
-
-            // Debug: Print to console
-            std::cout << "Input received. Current text: " << currentText << std::endl;
-        }
-    }
-}
 void Map::PropertyEditor::setup(sf::Font &loadedFont)
 {
     font = &loadedFont; // Store the font
@@ -705,80 +704,123 @@ void Map::PropertyEditor::setup(sf::Font &loadedFont)
     selectedInputBox = -1;
 }
 void Map::PropertyEditor::updateForEntity(Map::PlacedEntity *entity, sf::Font &font)
-{
-    selectedEntity = entity;
-    labels.clear();
-    inputBoxes.clear();
-    inputTexts.clear();
-    selectedInputBox = -1;
-
-    if (!entity)
-        return;
-
-    auto properties = entity->entity->getEditableProperties();
-    float yOffset = 10;
-    for (const auto &prop : properties)
     {
-        sf::Text label(prop.first + ":", font, 14);
-        label.setPosition(834, yOffset);
-        labels.push_back(label);
+        selectedEntity = entity;
+        labels.clear();
+        inputBoxes.clear();
+        inputTexts.clear();
+        selectedInputBox = -1;
 
-        sf::RectangleShape inputBox(sf::Vector2f(180, 20));
-        inputBox.setFillColor(sf::Color::White);
-        inputBox.setOutlineColor(sf::Color::Black);
-        inputBox.setOutlineThickness(1);
-        inputBox.setPosition(834, yOffset + 20);
-        inputBoxes.push_back(inputBox);
+        if (!entity)
+            return;
 
-        sf::Text inputText(prop.second, font, 14);
-        inputText.setPosition(838, yOffset + 22);
-        inputText.setFillColor(sf::Color::Black); // Ensure text color is visible
-        inputTexts.push_back(inputText);
+        auto properties = entity->entity->getEditableProperties();
+        float yOffset = 10;
+        for (const auto &prop : properties)
+        {
+            sf::Text label(prop.first + ":", font, 14);
+            label.setPosition(834, yOffset);
+            labels.push_back(label);
 
-        yOffset += 50;
+            sf::Text inputText(prop.second, font, 14);
+            inputText.setPosition(838, yOffset + 22);
+            inputText.setFillColor(sf::Color::Black);
+
+            // Calculate the required height for the input box
+            float requiredHeight = calculateRequiredHeight(inputText, 180);
+
+            sf::RectangleShape inputBox(sf::Vector2f(180, requiredHeight));
+            inputBox.setFillColor(sf::Color::White);
+            inputBox.setOutlineColor(sf::Color::Black);
+            inputBox.setOutlineThickness(1);
+            inputBox.setPosition(834, yOffset + 20);
+
+            inputBoxes.push_back(inputBox);
+            inputTexts.push_back(inputText);
+
+            yOffset += 30 + requiredHeight;
+        }
+
+        isOpen = true;
+        adjustBackgroundSize();
     }
-
-    isOpen = true; // Ensure property editor is open when updating for an entity
-}
 
 void Map::PropertyEditor::draw(sf::RenderWindow &window)
-{
-    if (!selectedEntity)
     {
+        if (!selectedEntity)
+        {
+            isOpen = false;
+            return;
+        }
+        isOpen = true;
+        window.draw(background);
+        for (const auto &label : labels)
+            window.draw(label);
+        for (const auto &box : inputBoxes)
+            window.draw(box);
+        for (auto &text : inputTexts)
+        {
+            wrapText(text, 170); // Reduced width to account for padding
+            window.draw(text);
+        }
 
-        isOpen = false;
-        return;
+        if (selectedInputBox >= 0 && selectedInputBox < inputBoxes.size())
+        {
+            sf::RectangleShape highlight = inputBoxes[selectedInputBox];
+            highlight.setFillColor(sf::Color::Transparent);
+            highlight.setOutlineColor(sf::Color::Red);
+            highlight.setOutlineThickness(2);
+            window.draw(highlight);
+        }
     }
-    isOpen = true;
-    window.draw(background);
-    for (const auto &label : labels)
-        window.draw(label);
-    for (const auto &box : inputBoxes)
-        window.draw(box);
-    for (const auto &text : inputTexts)
-        window.draw(text);
-
-    // Debug: Draw selected input box indicator
-    if (selectedInputBox >= 0 && selectedInputBox < inputBoxes.size())
+    void Map::PropertyEditor::wrapText(sf::Text &text, float maxWidth)
     {
-        sf::RectangleShape highlight = inputBoxes[selectedInputBox];
-        highlight.setFillColor(sf::Color::Transparent);
-        highlight.setOutlineColor(sf::Color::Red);
-        highlight.setOutlineThickness(2);
-        window.draw(highlight);
+        std::string words = text.getString();
+        std::string wrappedText;
+        std::string line;
+
+        for (char c : words)
+        {
+            sf::Text testText = text;
+            testText.setString(line + c);
+            
+            if (testText.getLocalBounds().width > maxWidth && !line.empty())
+            {
+                wrappedText += line + "\n";
+                line = c;
+            }
+            else
+            {
+                line += c;
+            }
+        }
+        wrappedText += line;
+        text.setString(wrappedText);
     }
-
-    // Debug: Draw text showing which box is selected and its content
-    sf::Text debugText("Selected: " + std::to_string(selectedInputBox), *font, 12);
-    debugText.setPosition(834, 380);
-    debugText.setFillColor(sf::Color::Red);
-    window.draw(debugText);
-
-    if (selectedInputBox >= 0 && selectedInputBox < inputTexts.size())
+    float Map::PropertyEditor::calculateRequiredHeight(const sf::Text &text, float maxWidth)
     {
-        sf::Text contentText("Content: " + inputTexts[selectedInputBox].getString(), *font, 12);
-        contentText.setPosition(834, 395);
-        contentText.setFillColor(sf::Color::Red);
-        window.draw(contentText);
+        sf::Text tempText = text;
+        wrapText(tempText, maxWidth);
+        return tempText.getLocalBounds().height + 20; // Increased padding
     }
-}
+     void Map::PropertyEditor::adjustLayout()
+    {
+        float yOffset = 10;
+        for (size_t i = 0; i < inputBoxes.size(); ++i)
+        {
+            labels[i].setPosition(834, yOffset);
+            inputBoxes[i].setPosition(834, yOffset + 20);
+            inputTexts[i].setPosition(838, yOffset + 22);
+            
+            yOffset += 30 + inputBoxes[i].getSize().y;
+        }
+        adjustBackgroundSize();
+    }
+     void Map::PropertyEditor::adjustBackgroundSize()
+    {
+        if (inputBoxes.empty())
+            return;
+        
+        float lastBoxBottom = inputBoxes.back().getPosition().y + inputBoxes.back().getSize().y;
+        background.setSize(sf::Vector2f(200, lastBoxBottom + 20)); // Add some padding at the bottom
+    }

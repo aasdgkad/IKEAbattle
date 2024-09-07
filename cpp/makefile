@@ -11,7 +11,7 @@ FREETYPE_INCLUDE = D:\ikeaBattle\freeType\freetype-2.13.3\include
 FREETYPE_LIB = D:\path\to\freetype\lib
 
 # Source Files
-SRC = map.cpp main.cpp Boss.cpp npc.cpp Menu.cpp item.cpp inventory.cpp attack.cpp idk.cpp Entity.cpp Animation.cpp GameOverScreen.cpp TextBox.cpp PacMan.cpp CollisionDetector.cpp player.cpp CutScene.cpp EntityFactory.cpp
+SRC = map.cpp main.cpp Boss.cpp npc.cpp Menu.cpp item.cpp inventory.cpp attack.cpp idk.cpp Entity.cpp Animation.cpp GameOverScreen.cpp TextBox.cpp PacMan.cpp CollisionDetector.cpp player.cpp CutScene.cpp EntityFactory.cpp GifPlayer.cpp
 
 # Object Files
 OBJ = $(SRC:.cpp=.o)

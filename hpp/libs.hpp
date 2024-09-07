@@ -14,7 +14,10 @@
 #include <iostream>//only used for debugging can be removed
 #include <stdexcept>
 #include <fstream>
+#include <sstream>
 #include <random>
+#include "stb_image.hpp"
+#include "GifPlayer.hpp"
 #include "EntityFactory.hpp"
 #include "map.hpp"
 #include "CutScene.hpp"
