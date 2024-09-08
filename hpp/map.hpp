@@ -81,7 +81,7 @@ public:
     void addObject(int x, int y, int w, int h); // A function that adds an object to the map
     void removeObject(int index);               // A function that removes an object from the current part
     void saveToFile(std::string fname);         // A function that saves the map to a file (used by the level editor)
-    void changePart(int x, int y); // It changes the part relative to the current one
+    void changePart(int x, int y);              // It changes the part relative to the current one
     sf::FloatRect getPartBounds();
     TextureMenu textureMenu;
     void drawTextureMenu();
@@ -112,7 +112,7 @@ public:
         std::unique_ptr<Entity> entity;
     };
     void removeEntity(int index);
-    void drawEditorEntities(sf::RenderWindow &window,Map::PlacedEntity *selectedEntity,bool &isOpen);
+    void drawEditorEntities(sf::RenderWindow &window, Map::PlacedEntity *selectedEntity, bool &isOpen);
     const sf::Texture *getEntityTexture(const std::string &entityName) const;
     std::vector<Entity *> activeEntities;
     void resetEntities(sf::FloatRect &playerBounds);
@@ -140,9 +140,9 @@ public:
     class PropertyEditor
     {
     public:
-    static const float INPUT_BOX_WIDTH;
-    static const float INPUT_BOX_HEIGHT;
-    static const float LINE_SPACING;
+        static const float INPUT_BOX_WIDTH;
+        static const float INPUT_BOX_HEIGHT;
+        static const float LINE_SPACING;
         sf::RectangleShape background;
         std::vector<sf::Text> labels;
         std::vector<sf::RectangleShape> inputBoxes;
@@ -164,6 +164,9 @@ public:
         void wrapText(sf::Text &text, float maxWidth);
         float calculateRequiredHeight(const sf::Text &text, float maxWidth);
         void adjustLayout();
+        void updateText();
         void adjustBackgroundSize();
+        sf::Clock inputClock;
+        std::string inputBuffer;
     };
 };

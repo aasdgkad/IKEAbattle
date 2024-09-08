@@ -166,7 +166,7 @@ void Map::addEntity(int x, int y, const std::string &entityType)
 {
     int wx = this->wndref.getSize().x;
     int wy = this->wndref.getSize().y;
-    sf::Vector2f position(x , y);
+    sf::Vector2f position(x, y);
 
     // Create the entity
     std::unique_ptr<Entity> newEntity(EntityFactory::createEntity(entityType, position, *gameOver));
@@ -645,56 +645,56 @@ void Map::removeDeadEntities()
         activeEntities.end());
 }
 void Map::PropertyEditor::applyChanges()
+{
+    if (!selectedEntity)
+        return;
+    auto properties = selectedEntity->entity->getEditableProperties();
+    for (size_t i = 0; i < properties.size() && i < inputTexts.size(); ++i)
     {
-        if (!selectedEntity)
-            return;
-        auto properties = selectedEntity->entity->getEditableProperties();
-        for (size_t i = 0; i < properties.size() && i < inputTexts.size(); ++i)
-        {
-            selectedEntity->entity->setProperty(properties[i].first, inputTexts[i].getString());
-        }
+        selectedEntity->entity->setProperty(properties[i].first, inputTexts[i].getString());
     }
+}
 void Map::PropertyEditor::handleInput(sf::Event &event, sf::RenderWindow &window)
-    {
-        if (!isOpen || !selectedEntity)
-            return;
+{
+    if (!isOpen || !selectedEntity)
+        return;
 
-        if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+    {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+        for (size_t i = 0; i < inputBoxes.size(); ++i)
         {
-            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-            for (size_t i = 0; i < inputBoxes.size(); ++i)
+            if (inputBoxes[i].getGlobalBounds().contains(mousePos.x, mousePos.y))
             {
-                if (inputBoxes[i].getGlobalBounds().contains(mousePos.x, mousePos.y))
-                {
-                    selectedInputBox = i;
-                    return;
-                }
+                selectedInputBox = i;
+                return;
             }
-            selectedInputBox = -1;
         }
-        else if (event.type == sf::Event::TextEntered && selectedInputBox != -1)
+        selectedInputBox = -1;
+    }
+    else if (event.type == sf::Event::TextEntered && selectedInputBox != -1)
+    {
+        if (event.text.unicode < 128)
         {
-            if (event.text.unicode < 128)
+            std::string currentText = inputTexts[selectedInputBox].getString();
+            if (event.text.unicode == '\b')
             {
-                std::string currentText = inputTexts[selectedInputBox].getString();
-                if (event.text.unicode == '\b')
-                {
-                    if (!currentText.empty())
-                        currentText.pop_back();
-                }
-                else
-                {
-                    currentText += static_cast<char>(event.text.unicode);
-                }
-                inputTexts[selectedInputBox].setString(currentText);
-                
-                // Recalculate the height of the input box and adjust layout
-                float requiredHeight = calculateRequiredHeight(inputTexts[selectedInputBox], 180);
-                inputBoxes[selectedInputBox].setSize(sf::Vector2f(180, requiredHeight));
-                adjustLayout();
+                if (!currentText.empty())
+                    currentText.pop_back();
             }
+            else
+            {
+                currentText += static_cast<char>(event.text.unicode);
+            }
+            inputTexts[selectedInputBox].setString(currentText);
+
+            // Recalculate the height of the input box and adjust layout
+            float requiredHeight = calculateRequiredHeight(inputTexts[selectedInputBox], 180);
+            inputBoxes[selectedInputBox].setSize(sf::Vector2f(180, requiredHeight));
+            adjustLayout();
         }
     }
+}
 void Map::PropertyEditor::setup(sf::Font &loadedFont)
 {
     font = &loadedFont; // Store the font
@@ -704,89 +704,95 @@ void Map::PropertyEditor::setup(sf::Font &loadedFont)
     selectedInputBox = -1;
 }
 void Map::PropertyEditor::updateForEntity(Map::PlacedEntity *entity, sf::Font &font)
+{
+    selectedEntity = entity;
+    labels.clear();
+    inputBoxes.clear();
+    inputTexts.clear();
+    selectedInputBox = -1;
+
+    if (!entity)
+        return;
+
+    auto properties = entity->entity->getEditableProperties();
+    float yOffset = 10;
+    for (const auto &prop : properties)
     {
-        selectedEntity = entity;
-        labels.clear();
-        inputBoxes.clear();
-        inputTexts.clear();
-        selectedInputBox = -1;
+        sf::Text label(prop.first + ":", font, 14);
+        label.setPosition(834, yOffset);
+        labels.push_back(label);
 
-        if (!entity)
-            return;
+        sf::Text inputText(prop.second, font, 14);
+        inputText.setPosition(838, yOffset + 22);
+        inputText.setFillColor(sf::Color::Black);
 
-        auto properties = entity->entity->getEditableProperties();
-        float yOffset = 10;
-        for (const auto &prop : properties)
-        {
-            sf::Text label(prop.first + ":", font, 14);
-            label.setPosition(834, yOffset);
-            labels.push_back(label);
+        // Calculate the required height for the input box
+        float requiredHeight = calculateRequiredHeight(inputText, 180);
 
-            sf::Text inputText(prop.second, font, 14);
-            inputText.setPosition(838, yOffset + 22);
-            inputText.setFillColor(sf::Color::Black);
+        sf::RectangleShape inputBox(sf::Vector2f(180, requiredHeight));
+        inputBox.setFillColor(sf::Color::White);
+        inputBox.setOutlineColor(sf::Color::Black);
+        inputBox.setOutlineThickness(1);
+        inputBox.setPosition(834, yOffset + 20);
 
-            // Calculate the required height for the input box
-            float requiredHeight = calculateRequiredHeight(inputText, 180);
+        inputBoxes.push_back(inputBox);
+        inputTexts.push_back(inputText);
 
-            sf::RectangleShape inputBox(sf::Vector2f(180, requiredHeight));
-            inputBox.setFillColor(sf::Color::White);
-            inputBox.setOutlineColor(sf::Color::Black);
-            inputBox.setOutlineThickness(1);
-            inputBox.setPosition(834, yOffset + 20);
-
-            inputBoxes.push_back(inputBox);
-            inputTexts.push_back(inputText);
-
-            yOffset += 30 + requiredHeight;
-        }
-
-        isOpen = true;
-        adjustBackgroundSize();
+        yOffset += 30 + requiredHeight;
     }
+
+    isOpen = true;
+    adjustBackgroundSize();
+}
 
 void Map::PropertyEditor::draw(sf::RenderWindow &window)
+{
+    if (!selectedEntity)
     {
-        if (!selectedEntity)
-        {
-            isOpen = false;
-            return;
-        }
-        isOpen = true;
-        window.draw(background);
-        for (const auto &label : labels)
-            window.draw(label);
-        for (const auto &box : inputBoxes)
-            window.draw(box);
-        for (auto &text : inputTexts)
-        {
-            wrapText(text, 170); // Reduced width to account for padding
-            window.draw(text);
-        }
-
-        if (selectedInputBox >= 0 && selectedInputBox < inputBoxes.size())
-        {
-            sf::RectangleShape highlight = inputBoxes[selectedInputBox];
-            highlight.setFillColor(sf::Color::Transparent);
-            highlight.setOutlineColor(sf::Color::Red);
-            highlight.setOutlineThickness(2);
-            window.draw(highlight);
-        }
+        isOpen = false;
+        return;
     }
-    void Map::PropertyEditor::wrapText(sf::Text &text, float maxWidth)
+    isOpen = true;
+    window.draw(background);
+    for (const auto &label : labels)
+        window.draw(label);
+    for (const auto &box : inputBoxes)
+        window.draw(box);
+    for (auto &text : inputTexts)
     {
-        std::string words = text.getString();
-        std::string wrappedText;
-        std::string line;
+        wrapText(text, 170); // Reduced width to account for padding
+        window.draw(text);
+    }
 
-        for (char c : words)
+    if (selectedInputBox >= 0 && selectedInputBox < inputBoxes.size())
+    {
+        sf::RectangleShape highlight = inputBoxes[selectedInputBox];
+        highlight.setFillColor(sf::Color::Transparent);
+        highlight.setOutlineColor(sf::Color::Red);
+        highlight.setOutlineThickness(2);
+        window.draw(highlight);
+    }
+}
+void Map::PropertyEditor::wrapText(sf::Text &text, float maxWidth)
+{
+    const std::string &words = text.getString();
+    std::string wrappedText;
+    std::string line;
+    sf::Text testText = text;
+
+    for (char c : words)
+    {
+        if (c == '\n')
         {
-            sf::Text testText = text;
+            wrappedText += line + '\n';
+            line.clear();
+        }
+        else
+        {
             testText.setString(line + c);
-            
             if (testText.getLocalBounds().width > maxWidth && !line.empty())
             {
-                wrappedText += line + "\n";
+                wrappedText += line + '\n';
                 line = c;
             }
             else
@@ -794,33 +800,34 @@ void Map::PropertyEditor::draw(sf::RenderWindow &window)
                 line += c;
             }
         }
-        wrappedText += line;
-        text.setString(wrappedText);
     }
-    float Map::PropertyEditor::calculateRequiredHeight(const sf::Text &text, float maxWidth)
+    wrappedText += line;
+    text.setString(wrappedText);
+}
+float Map::PropertyEditor::calculateRequiredHeight(const sf::Text &text, float maxWidth)
+{
+    sf::Text tempText = text;
+    wrapText(tempText, maxWidth);
+    return tempText.getLocalBounds().height + 20; // Increased padding
+}
+void Map::PropertyEditor::adjustLayout()
+{
+    float yOffset = 10;
+    for (size_t i = 0; i < inputBoxes.size(); ++i)
     {
-        sf::Text tempText = text;
-        wrapText(tempText, maxWidth);
-        return tempText.getLocalBounds().height + 20; // Increased padding
+        labels[i].setPosition(834, yOffset);
+        inputBoxes[i].setPosition(834, yOffset + 20);
+        inputTexts[i].setPosition(838, yOffset + 22);
+
+        yOffset += 30 + inputBoxes[i].getSize().y;
     }
-     void Map::PropertyEditor::adjustLayout()
-    {
-        float yOffset = 10;
-        for (size_t i = 0; i < inputBoxes.size(); ++i)
-        {
-            labels[i].setPosition(834, yOffset);
-            inputBoxes[i].setPosition(834, yOffset + 20);
-            inputTexts[i].setPosition(838, yOffset + 22);
-            
-            yOffset += 30 + inputBoxes[i].getSize().y;
-        }
-        adjustBackgroundSize();
-    }
-     void Map::PropertyEditor::adjustBackgroundSize()
-    {
-        if (inputBoxes.empty())
-            return;
-        
-        float lastBoxBottom = inputBoxes.back().getPosition().y + inputBoxes.back().getSize().y;
-        background.setSize(sf::Vector2f(200, lastBoxBottom + 20)); // Add some padding at the bottom
-    }
+    adjustBackgroundSize();
+}
+void Map::PropertyEditor::adjustBackgroundSize()
+{
+    if (inputBoxes.empty())
+        return;
+
+    float lastBoxBottom = inputBoxes.back().getPosition().y + inputBoxes.back().getSize().y;
+    background.setSize(sf::Vector2f(200, lastBoxBottom + 20)); // Add some padding at the bottom
+}
