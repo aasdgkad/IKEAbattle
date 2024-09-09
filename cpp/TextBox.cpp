@@ -57,13 +57,13 @@ void TextBox::draw(sf::RenderWindow& windowr)
         float imageWidth = hasCharacterImage ? 70.0f : 0.0f; // Adjust this value based on your image size
         float textBoxWidth = windowr.getSize().x / 3;
 
-        background.setPosition(sf::Vector2f(windowr.getSize().x / 6 + imageWidth, windowr.getSize().y - 115));
-        visibleContent.setPosition(sf::Vector2f(windowr.getSize().x / 6 + imageWidth + 10.0f, windowr.getSize().y - 115 + 10.0f));
+        background.setPosition(sf::Vector2f(windowr.getSize().x / 6 + imageWidth, windowr.getSize().y - 110));
+        visibleContent.setPosition(sf::Vector2f(windowr.getSize().x / 6 + imageWidth + 10.0f, windowr.getSize().y - 110 + 10.0f));
         background.setSize(sf::Vector2f(textBoxWidth, 70.0f));
 
         if (hasCharacterImage)
         {
-            characterSprite.setPosition(sf::Vector2f(windowr.getSize().x / 6, windowr.getSize().y - 115));
+            characterSprite.setPosition(sf::Vector2f(windowr.getSize().x / 6, windowr.getSize().y - 110));
             windowr.draw(characterSprite);
         }
 

@@ -53,7 +53,7 @@ void PacMan::update(float deltaTime, Map &map, const sf::Vector2u &screenres)
 
     updateDirection();
     position += velocity * deltaTime;
-    getSprite().setPosition(position);
+    setPosition(position);
 
     lifeTimer += deltaTime;
     if(getSprite().getGlobalBounds().intersects(*playerBounds)){

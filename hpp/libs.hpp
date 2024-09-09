@@ -31,6 +31,7 @@
 #include "PacMan.hpp"
 #include "player.hpp"
 #include "npc.hpp"
+#include "penguin.hpp"
 #include "Menu.hpp"
 #include "GameOverScreen.hpp"
 #include "item.hpp"

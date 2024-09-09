@@ -14,8 +14,8 @@ public:
         
     }
     virtual ~Entity() = default;
-    void setPosition(const sf::Vector2f &pos); // Set the entity's position
-    void setPosition(float x, float y);
+    void setPosition(const sf::Vector2f &pos); // Set the entity's position (sets the position of the sprite for example)
+    void setPosition(float x, float y);// Set the entity's position (sets the position of the sprite for example)
     sf::Vector2f getPosition() const; // Get the entity's current position
     void move(const sf::Vector2f& offset); // Move the entity by a given offset
     bool isOnScreen(sf::FloatRect screen);

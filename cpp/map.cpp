@@ -124,7 +124,7 @@ std::vector<sf::FloatRect> Map::getEntityBounds()
     std::vector<sf::FloatRect> bounds;
     for (const auto &entity : placedEntities)
     {
-        bounds.push_back(entity.sprite.getGlobalBounds());
+        bounds.push_back(entity->sprite.getGlobalBounds());
     }
     return bounds;
 }
@@ -133,24 +133,19 @@ void Map::removeEntity(int x, int y)
     sf::Vector2f mousePos(x, y);
 
     // Remove from placedEntities
-    for (auto it = placedEntities.begin(); it != placedEntities.end(); ++it)
-    {
-        if (it->sprite.getGlobalBounds().contains(mousePos))
-        {
-            placedEntities.erase(it);
-            break;
-        }
-    }
+    auto it = std::find_if(placedEntities.begin(), placedEntities.end(),
+                           [&mousePos](const std::unique_ptr<PlacedEntity> &entity)
+                           {
+                               return entity->sprite.getGlobalBounds().contains(mousePos);
+                           });
 
-    // Remove from entities map
-    auto &entitiesInCurrentPart = entities[mx][my];
-    for (auto it = entitiesInCurrentPart.begin(); it != entitiesInCurrentPart.end(); ++it)
+    if (it != placedEntities.end())
     {
-        if (it->second == mousePos)
-        {
-            entitiesInCurrentPart.erase(it);
-            break;
-        }
+        std::cout << "\n"
+                  << (*it)->sprite.getPosition().x
+                  << " " << (*it)->sprite.getPosition().y
+                  << " " << (*it)->type << " deleted";
+        placedEntities.erase(it);
     }
 }
 const sf::Texture *Map::getEntityTexture(const std::string &entityName) const
@@ -164,6 +159,8 @@ const sf::Texture *Map::getEntityTexture(const std::string &entityName) const
 }
 void Map::addEntity(int x, int y, const std::string &entityType)
 {
+    std::cout << "\n"
+              << x << " " << y << " " << entityType;
     int wx = this->wndref.getSize().x;
     int wy = this->wndref.getSize().y;
     sf::Vector2f position(x, y);
@@ -173,9 +170,6 @@ void Map::addEntity(int x, int y, const std::string &entityType)
 
     if (newEntity)
     {
-        // Add to entities map
-        entities[mx][my].push_back(std::make_pair(entityType, position));
-
         // Create sprite
         if (entityTextures.find(entityType) != entityTextures.end())
         {
@@ -183,18 +177,21 @@ void Map::addEntity(int x, int y, const std::string &entityType)
             sprite.setPosition(position);
 
             // Add to placedEntities
-            placedEntities.push_back(PlacedEntity{sprite, entityType, std::move(newEntity)});
+            placedEntities.push_back(std::make_unique<PlacedEntity>(PlacedEntity{
+                std::move(sprite),
+                entityType,
+                std::move(newEntity)}));
         }
     }
 }
-void Map::drawEditorEntities(sf::RenderWindow &window, Map::PlacedEntity *selectedEntity, bool &isOpen)
+void Map::drawEditorEntities(sf::RenderWindow &window, const PlacedEntity *selectedEntity, bool &isOpen)
 {
-    for (const auto &entity : placedEntities)
+    for (const auto &entityPtr : placedEntities)
     {
-        sf::Sprite entitySprite = entity.sprite;
+        sf::Sprite entitySprite = entityPtr->sprite;
 
         // Check if this entity is the selected one and the property editor is open
-        if (&entity == selectedEntity && isOpen)
+        if (entityPtr.get() == selectedEntity && isOpen)
         {
             // Set the color to pink
             entitySprite.setColor(sf::Color(255, 92, 3, 255)); // Pink color
@@ -347,7 +344,7 @@ int Map::getSelectedTextureIndex() const
 Map::Map(sf::RenderWindow &wndref, bool &gameover)
     : mx(0), my(0), np(1), wndref(wndref), gameOver(&gameover),
       textureMenu({"../imgs/wow.png", "../imgs/woow.png", "../imgs/wooow.png", "../imgs/woooow.png"}, wndref),
-      entityMenu({"../imgs/player.png", "../imgs/pacman.png", "../imgs/capybaraa.png", "../imgs/arrow.png"}, wndref)
+      entityMenu({"../imgs/player.png", "../imgs/pacman.png", "../imgs/capybaraa.png", "../imgs/arrow.png", "../imgs/pengu.png"}, wndref)
 {
     this->view.setSize(wndref.getSize().x, wndref.getSize().y);
 }
@@ -355,7 +352,7 @@ Map::Map(sf::RenderWindow &wndref, bool &gameover)
 Map::Map(std::string fname, sf::RenderWindow &wndref, bool &gameover)
     : mx(0), my(0), np(1), wndref(wndref), gameOver(&gameover),
       textureMenu({"../imgs/wow.png", "../imgs/woow.png", "../imgs/wooow.png", "../imgs/woooow.png"}, wndref),
-      entityMenu({"../imgs/player.png", "../imgs/pacman.png", "../imgs/arrow.png", "../imgs/capybaraa.png"}, wndref)
+      entityMenu({"../imgs/player.png", "../imgs/pacman.png", "../imgs/arrow.png", "../imgs/capybaraa.png", "../imgs/pengu.png"}, wndref)
 {
     this->view.setSize(wndref.getSize().x, wndref.getSize().y);
     if (std::filesystem::exists(fname))
@@ -433,13 +430,12 @@ Map::Map(std::string fname, sf::RenderWindow &wndref, bool &gameover)
                     sprite.setPosition(x, y);
 
                     // Add to placedEntities
-                    placedEntities.push_back(PlacedEntity{sprite, entityType, std::move(newEntity)});
+                    placedEntities.push_back(std::make_unique<PlacedEntity>(PlacedEntity{sprite, entityType, std::move(newEntity)}));
                 }
             }
         }
     }
 }
-
 void Map::draw()
 {
     for (int i = 0; i < this->obj[mx][my].size(); i++)
@@ -452,10 +448,14 @@ void Map::addObject(int x, int y, int w, int h)
 {
     std::string textureName = textureMenu.textureNames[textureMenu.selectedIndex];
     int wx = this->wndref.getSize().x, wy = this->wndref.getSize().y;
+    std::cout << "\n"
+              << x + wx * mx << " " << y + wy * my << " " << textureName;
     this->obj[mx][my].push_back(new Object(x + wx * mx, y + wy * my, w, h, "../imgs/" + textureName + ".png"));
 }
 void Map::removeObject(int index)
 {
+    std::cout << "\n"
+              << this->obj[mx][my].at(index)->rect.getPosition().x << " " << this->obj[mx][my].at(index)->rect.getPosition().y << " " << this->obj[mx][my].at(index)->texid << " deleted";
     this->obj[mx][my].erase(this->obj[mx][my].begin() + index);
 }
 
@@ -502,16 +502,16 @@ void Map::saveToFile(std::string fname)
     for (const auto &entity : this->placedEntities)
     {
         // Save entity type
-        int nameLength = entity.type.length();
+        int nameLength = entity->type.length();
         file.write((char *)&nameLength, sizeof(int));
-        file.write(entity.type.c_str(), nameLength);
+        file.write(entity->type.c_str(), nameLength);
 
         // Save entity position
-        file.write((char *)&entity.sprite.getPosition().x, sizeof(float));
-        file.write((char *)&entity.sprite.getPosition().y, sizeof(float));
+        file.write((char *)&entity->sprite.getPosition().x, sizeof(float));
+        file.write((char *)&entity->sprite.getPosition().y, sizeof(float));
 
         // Save entity properties
-        auto properties = entity.entity->getEditableProperties();
+        auto properties = entity->entity->getEditableProperties();
         int propertyCount = properties.size();
         file.write((char *)&propertyCount, sizeof(int));
         for (const auto &prop : properties)
@@ -579,6 +579,10 @@ void Map::removeEntity(int index)
 {
     if (index >= 0 && index < placedEntities.size())
     {
+        std::cout << "\n"
+                  << placedEntities[index]->sprite.getPosition().x
+                  << " " << placedEntities[index]->sprite.getPosition().y
+                  << " " << placedEntities[index]->type << " deleted";
         placedEntities.erase(placedEntities.begin() + index);
     }
 }
@@ -592,8 +596,8 @@ void Map::spawnEntities(sf::FloatRect &playerBounds)
 {
     for (const auto &placedEntity : placedEntities)
     {
-        const sf::Vector2f position = placedEntity.sprite.getPosition();
-        const std::string &type = placedEntity.type;
+        const sf::Vector2f position = placedEntity->sprite.getPosition();
+        const std::string &type = placedEntity->type;
 
         // Create a new instance of the entity
         std::unique_ptr<Entity> entity(EntityFactory::createEntity(type, position, *gameOver));
@@ -603,7 +607,7 @@ void Map::spawnEntities(sf::FloatRect &playerBounds)
             entity->playerBounds = &playerBounds;
 
             // Copy the properties from the placed entity to the new instance
-            auto properties = placedEntity.entity->getEditableProperties();
+            auto properties = placedEntity->entity->getEditableProperties();
             for (const auto &prop : properties)
             {
                 entity->setProperty(prop.first, prop.second);

@@ -112,7 +112,7 @@ public:
         std::unique_ptr<Entity> entity;
     };
     void removeEntity(int index);
-    void drawEditorEntities(sf::RenderWindow &window, Map::PlacedEntity *selectedEntity, bool &isOpen);
+    void drawEditorEntities(sf::RenderWindow &window, const Map::PlacedEntity *selectedEntity, bool &isOpen);
     const sf::Texture *getEntityTexture(const std::string &entityName) const;
     std::vector<Entity *> activeEntities;
     void resetEntities(sf::FloatRect &playerBounds);
@@ -122,15 +122,15 @@ public:
 
     void drawEntities(sf::RenderWindow &window);
 
-    std::vector<PlacedEntity> placedEntities;
+    std::vector<std::unique_ptr<PlacedEntity>> placedEntities;
 
     void addEntity(int x, int y, const std::string &entityType);
+    sf::Clock inputClock;
+    std::string inputBuffer;
 
 private:
-    std::vector<std::map<std::string, std::string>> entityProperties;
-    static std::unordered_map<std::string, sf::Texture> entityTextures;
+    static std::unordered_map<std::string, sf::Texture> entityTextures;          // used in the editor for the placed entities
     std::unordered_map<int, std::unordered_map<int, std::vector<Object *>>> obj; // It used to be a vector with pointers to the actual objects contained by the map
-    std::unordered_map<int, std::unordered_map<int, std::vector<std::pair<std::string, sf::Vector2f>>>> entities;
     int mx, my, np;
     sf::View view;
     sf::RenderWindow &wndref;
@@ -164,7 +164,6 @@ public:
         void wrapText(sf::Text &text, float maxWidth);
         float calculateRequiredHeight(const sf::Text &text, float maxWidth);
         void adjustLayout();
-        void updateText();
         void adjustBackgroundSize();
         sf::Clock inputClock;
         std::string inputBuffer;

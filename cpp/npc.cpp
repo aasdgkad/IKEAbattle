@@ -10,8 +10,8 @@ Npc::Npc(sf::Vector2f position)
 
 void Npc::loadSprite()
 {
-       loadSpritesheet("../imgs/capybara.png", 64, 64); // Adjust path and dimensions as needed
-       addAnimation("idle", 1, 8);                      // Assuming the idle animation has 4 frames
+       loadSpritesheet("../imgs/capybara.png", 64, 64);
+       addAnimation("idle", 1, 8); 
        setAnimation("idle");
 }
 
@@ -21,7 +21,7 @@ void Npc::update(float deltaTime, Map &map, const sf::Vector2u &screenres)
        {
               velocity.y += gravity * deltaTime;
               position.y += velocity.y * deltaTime;
-              getSprite().setPosition(position);
+              setPosition(position);
               manageCollisions(map.getObjectBounds());
               checkCollisionWithPlayer(*playerBounds);
               Animation::update(deltaTime);
@@ -85,7 +85,6 @@ void Npc::manageCollisions(const std::vector<sf::FloatRect> &objectBounds)
                             break;
                      }
                      setPosition(position);
-                     getSprite().setPosition(position);
               }
        }
 }

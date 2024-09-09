@@ -125,11 +125,11 @@ int main()
                     Map::PlacedEntity *clickedEntity = nullptr;
                     for (auto &placedEntity : map.placedEntities)
                     {
-                        if (placedEntity.sprite.getGlobalBounds().contains(worldPos))
+                        if (placedEntity->sprite.getGlobalBounds().contains(worldPos))
                         {
                             map.textureMenu.isOpen=false;
                             map.entityMenu.isOpen=false;
-                            clickedEntity = &placedEntity;
+                            clickedEntity = placedEntity.get();
                             break;
                         }
                     }
@@ -150,7 +150,6 @@ int main()
                     else
                     {
                         sf::Vector2f entityPos = entityPreview.getPosition();
-                        std::cout<<entityPos.x<<" "<<entityPos.y<<"\n";
                         sf::Vector2f entitySize = sf::Vector2f(entityPreview.getGlobalBounds().width, entityPreview.getGlobalBounds().height);
                         map.addEntity(entityPos.x - entitySize.x / 2, entityPos.y - entitySize.y / 2, map.getSelectedEntityName());
                     }
@@ -239,7 +238,7 @@ int main()
                     // Check for entity deletion
                     for (int i = map.placedEntities.size() - 1; i >= 0; --i)
                     {
-                        if (map.placedEntities[i].sprite.getGlobalBounds().contains(worldPos))
+                        if (map.placedEntities[i]->sprite.getGlobalBounds().contains(worldPos))
                         {
                             map.removeEntity(i);
                             break;
