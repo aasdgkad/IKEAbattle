@@ -1,7 +1,7 @@
 #include "../hpp/libs.hpp"
 class TextBox; 
 Npc::Npc(sf::Vector2f position)
-    : Entity(), gravity(980.0f), isColliding(false)
+    : Animation(), CollisionDetector(), gravity(980.0f), isColliding(false)
 {
        textBox = std::make_unique<TextBox>("", 0.007f);
        setPosition(position);
@@ -24,7 +24,7 @@ void Npc::update(float deltaTime, Map &map, const sf::Vector2u &screenres)
               setPosition(position);
               manageCollisions(map.getObjectBounds());
               checkCollisionWithPlayer(*playerBounds);
-              Animation::update(deltaTime);
+              Animation::update(deltaTime,map,screenres);
 
               if (textBox)
               {
@@ -35,13 +35,13 @@ void Npc::update(float deltaTime, Map &map, const sf::Vector2u &screenres)
 
 void Npc::draw(sf::RenderWindow &window)
 {
-       window.draw(getSprite());
+       Animation::draw(window);
        textBox->draw(window);
 }
 
 void Npc::checkCollisionWithPlayer(const sf::FloatRect &playerBounds)
 {
-       sf::FloatRect npcBounds = getSprite().getGlobalBounds();
+       sf::FloatRect npcBounds = sprite.getGlobalBounds();
        if (npcBounds.intersects(playerBounds))
        {
               if (!isColliding)
@@ -65,7 +65,7 @@ void Npc::checkCollisionWithPlayer(const sf::FloatRect &playerBounds)
 
 void Npc::manageCollisions(const std::vector<sf::FloatRect> &objectBounds)
 {
-       sf::FloatRect npcBounds = getSprite().getGlobalBounds();
+       sf::FloatRect npcBounds = sprite.getGlobalBounds();
        for (const auto &obstacle : objectBounds)
        {
               CollisionInfo collision = checkCollision(npcBounds, {obstacle});

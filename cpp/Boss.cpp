@@ -35,7 +35,7 @@ void Boss::setInitialPosition()
     eyesprite.setPosition(x - eyesprite.getGlobalBounds().width / 2.0f, y - eyesprite.getGlobalBounds().height / 2.0f);
 }
 
-void Boss::update(float deltaTime, Map &map, const sf::Vector2u &screenres)
+void Boss::update(float deltaTime, Map &map, const sf::Vector2u& screenres)
 {
     // Calculate direction to player
     sf::Vector2f bossPosition = sprite.getPosition();

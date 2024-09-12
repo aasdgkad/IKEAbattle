@@ -2,7 +2,8 @@
 #include "../hpp/penguin.hpp"
 
 Penguin::Penguin(sf::Vector2f position)
-    : Entity(), gravity(980.0f), isColliding(false), isMovingRight(true), speed(200.0f) {
+    : Animation(), CollisionDetector(), gravity(980.0f), isColliding(false), 
+    speed(200.0f) {
     setPosition(position);
     loadSprite();
 }
@@ -13,7 +14,7 @@ void Penguin::loadSprite() {
     setAnimation("spin");
 }
 
-void Penguin::update(float deltaTime, Map& map, const sf::Vector2u& screenres) {
+void Penguin::update(float deltaTime, Map &map, const sf::Vector2u& screenres) {
     if (isOnScreen(map.getPartBounds())) {
         velocity.y += gravity * deltaTime;
         position.y += velocity.y * deltaTime;
@@ -23,16 +24,16 @@ void Penguin::update(float deltaTime, Map& map, const sf::Vector2u& screenres) {
 
         setPosition(position);
         manageCollisions(map.getObjectBounds());
-        Animation::update(deltaTime);
+        Animation::update(deltaTime,map,screenres);
     }
 }
 
 void Penguin::draw(sf::RenderWindow& window) {
-    window.draw(getSprite());
+    Animation::draw(window);
 }
 
 void Penguin::manageCollisions(const std::vector<sf::FloatRect>& objectBounds) {
-    sf::FloatRect penguinBounds = getSprite().getGlobalBounds();
+    sf::FloatRect penguinBounds = sprite.getGlobalBounds();
     for (const auto& obstacle : objectBounds) {
         CollisionInfo collision = checkCollision(penguinBounds, {obstacle});
         if (collision.collided) {
@@ -42,10 +43,8 @@ void Penguin::manageCollisions(const std::vector<sf::FloatRect>& objectBounds) {
                     velocity.y = 0;
                     break;
                 case CollisionSide::Left:
-                    speed=-speed;
-                    break;
                 case CollisionSide::Right:
-                    speed=-speed;
+                    speed = -speed;
                     break;
                 case CollisionSide::Top:
                     position.y = obstacle.top + obstacle.height;
@@ -57,12 +56,4 @@ void Penguin::manageCollisions(const std::vector<sf::FloatRect>& objectBounds) {
             setPosition(position);
         }
     }
-}
-
-std::vector<std::pair<std::string, std::string>> Penguin::getEditableProperties() const {
-    return {};
-}
-
-void Penguin::setProperty(const std::string& name, const std::string& value) {
-    // No editable properties
 }

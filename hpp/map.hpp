@@ -21,54 +21,61 @@ private:
     };
 
 public:
-    class EntityMenu
-    {
+    class Menu
+{
     public:
-        EntityMenu(const std::vector<std::string> &entityPaths, sf::RenderWindow &window);
+    std::string getFileNameWithoutExtension(const std::string& path)
+    {
+        // Find the last occurrence of '/' or '\' to get the start of the filename
+        size_t lastSlash = path.find_last_of("/\\");
+        std::string fileName = (lastSlash == std::string::npos) ? path : path.substr(lastSlash + 1);
+
+        // Find the last occurrence of '.' to remove the extension
+        size_t lastDot = fileName.find_last_of(".");
+        if (lastDot != std::string::npos)
+        {
+            fileName = fileName.substr(0, lastDot);
+        }
+
+        return fileName;
+    }
+        Menu(const std::vector<std::string>& entityPaths, const std::vector<std::string>& texturePaths, sf::RenderWindow& window);
         void draw();
         void selectNext();
         void selectPrevious();
         bool isOpen = false;
         int selectedIndex;
+        bool isEntitySelected() const { return selectedIndex < entityTextures.size(); }
 
         std::vector<sf::Texture> entityTextures;
         std::vector<std::string> entityNames;
-
-    private:
-        sf::RenderWindow &window;
-        std::string getFileNameWithoutExtension(const std::string &path);
-    };
-    class TextureMenu
-    {
-    public:
-        TextureMenu(const std::vector<std::string> &texturePaths, sf::RenderWindow &window);
-        void draw();
-        void selectNext();
-        void selectPrevious();
-        bool isOpen = false;
-        sf::Sprite selectedTexture;
-        int selectedIndex;
-
         std::vector<sf::Texture> textures;
         std::vector<std::string> textureNames;
 
-    private:
-        std::string getFileNameWithoutExtension(const std::string &path)
+        // Add this new function
+        const std::string& getSelectedName() const 
         {
-            size_t lastSlash = path.find_last_of("/\\");
-            size_t lastDot = path.find_last_of(".");
-            if (lastSlash == std::string::npos)
-                lastSlash = 0;
+            if (isEntitySelected())
+            {
+                return entityNames[selectedIndex];
+            }
             else
-                lastSlash++;
-            if (lastDot == std::string::npos || lastDot < lastSlash)
-                lastDot = path.length();
-            return path.substr(lastSlash, lastDot - lastSlash);
+            {
+                return textureNames[selectedIndex - entityTextures.size()];
+            }
         }
-        sf::RenderWindow &window;
+
+    private:
+        sf::RenderWindow& window;
+        //std::string getFileNameWithoutExtension(const std::string& path);
     };
 
+
 public:
+    bool handleMenuClick(const sf::Vector2i& mousePosition);
+    const std::string& getSelectedName() const;
+
+
     bool *gameOver;
     std::vector<sf::FloatRect> getObjectBounds();
     Map(sf::RenderWindow &wndref, bool &gameover);
@@ -83,25 +90,7 @@ public:
     void saveToFile(std::string fname);         // A function that saves the map to a file (used by the level editor)
     void changePart(int x, int y);              // It changes the part relative to the current one
     sf::FloatRect getPartBounds();
-    TextureMenu textureMenu;
-    void drawTextureMenu();
-    const std::string &getSelectedEntityName() const;
-    bool handleTextureMenuClick(const sf::Vector2i &mousePosition);
-    void toggleTextureMenu();
-    void selectNextTexture();
-    void selectPreviousTexture();
-    int getSelectedTextureIndex() const;
-    const sf::Texture *getSelectedTexture() const;
-    bool isTextureMenuOpen() const;
-
-    EntityMenu entityMenu;
-    void drawEntityMenu();
-    bool handleEntityMenuClick(const sf::Vector2i &mousePosition);
-    void toggleEntityMenu();
-    void selectNextEntity();
-    void selectPreviousEntity();
-    int getSelectedEntityIndex() const;
-    bool isEntityMenuOpen() const;
+    Menu menu;
     void removeEntity(int x, int y);
     std::vector<sf::FloatRect> getEntityBounds();
 
@@ -111,6 +100,7 @@ public:
         std::string type;
         std::unique_ptr<Entity> entity;
     };
+    const sf::Texture* getSelectedTexture() const;
     void removeEntity(int index);
     void drawEditorEntities(sf::RenderWindow &window, const Map::PlacedEntity *selectedEntity, bool &isOpen);
     const sf::Texture *getEntityTexture(const std::string &entityName) const;
@@ -165,7 +155,5 @@ public:
         float calculateRequiredHeight(const sf::Text &text, float maxWidth);
         void adjustLayout();
         void adjustBackgroundSize();
-        sf::Clock inputClock;
-        std::string inputBuffer;
     };
 };

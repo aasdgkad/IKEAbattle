@@ -11,7 +11,7 @@ FREETYPE_INCLUDE = D:\ikeaBattle\freeType\freetype-2.13.3\include
 FREETYPE_LIB = D:\path\to\freetype\lib
 
 # Source Files without the "cpp/" prefix
-SRC_FILES = map.cpp leveleditor.cpp Boss.cpp npc.cpp Menu.cpp item.cpp inventory.cpp attack.cpp idk.cpp Entity.cpp Animation.cpp GameOverScreen.cpp TextBox.cpp PacMan.cpp CollisionDetector.cpp player.cpp CutScene.cpp EntityFactory.cpp GifPlayer.cpp penguin.cpp
+SRC_FILES = map.cpp leveleditor.cpp Boss.cpp npc.cpp Menu.cpp item.cpp inventory.cpp attack.cpp idk.cpp Entity.cpp Animation.cpp GameOverScreen.cpp TextBox.cpp PacMan.cpp CollisionDetector.cpp player.cpp CutScene.cpp EntityFactory.cpp GifPlayer.cpp penguin.cpp sprite.cpp
 
 # Add the "cpp/" prefix to each source file
 SRC = $(addprefix cpp/,$(SRC_FILES))

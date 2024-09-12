@@ -1,6 +1,6 @@
 #include "../hpp/libs.hpp"
 Idk::Idk(sf::Vector2f position, float moveDistance)
-    : Entity(), moveSpeed(100.0f), moveDistance(moveDistance), initialX(position.x), gravity(980.0f), movingRight(true)
+    : Animation(), CollisionDetector(), moveSpeed(100.0f), moveDistance(moveDistance), initialX(position.x), gravity(980.0f), movingRight(true)
 {
     setPosition(position);
     loadSprite();
@@ -12,7 +12,7 @@ void Idk::loadSprite()
     addAnimation("default", 0, 1);
     setAnimation("default");
 }
-void Idk::update(float deltaTime, Map &map, const sf::Vector2u &screenres)
+void Idk::update(float deltaTime, Map &map, const sf::Vector2u& screenres)
 {
     if (isOnScreen(map.getPartBounds()))
     {
@@ -35,17 +35,17 @@ void Idk::update(float deltaTime, Map &map, const sf::Vector2u &screenres)
         }
         // Update position
         position += velocity * deltaTime;
-        getSprite().setPosition(position);
+        setPosition(position);
         manageCollisions(map.getObjectBounds());
 
         // Update animation
-        Animation::update(deltaTime);
+        Animation::update(deltaTime,map,screenres);
     }
 }
 
 void Idk::draw(sf::RenderWindow &window)
 {
-    window.draw(getSprite());
+    Animation::draw(window);
 }
 bool Idk::isOutOfBounds(const sf::Vector2u &windowSize) const
 {
@@ -55,7 +55,7 @@ bool Idk::isOutOfBounds(const sf::Vector2u &windowSize) const
 
 void Idk::manageCollisions(const std::vector<sf::FloatRect> &objectBounds)
 {
-    sf::FloatRect platformBounds = getSprite().getGlobalBounds();
+    sf::FloatRect platformBounds = sprite.getGlobalBounds();
     for (const auto &obstacle : objectBounds)
     {
         CollisionInfo collision = checkCollision(platformBounds, {obstacle});
@@ -80,7 +80,6 @@ void Idk::manageCollisions(const std::vector<sf::FloatRect> &objectBounds)
                 break;
             }
             setPosition(position);
-            getSprite().setPosition(position); // Use getSprite() instead of shape
         }
     }
 }

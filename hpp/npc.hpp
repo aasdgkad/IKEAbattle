@@ -1,6 +1,6 @@
 #pragma once
 class Map; // Forward declaration
-class Npc : public Entity {
+class Npc : public Animation, public CollisionDetector {
 public:
     Npc(sf::Vector2f position);
     void update(float deltaTime, Map& map, const sf::Vector2u& screenres) override;

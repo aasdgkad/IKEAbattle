@@ -1,124 +1,6 @@
 #include "../hpp/libs.hpp"
 std::unordered_map<std::string, sf::Texture> Map::entityTextures;
-Map::EntityMenu::EntityMenu(const std::vector<std::string> &entityPaths, sf::RenderWindow &window)
-    : selectedIndex(0), window(window)
-{
-    for (const auto &path : entityPaths)
-    {
-        sf::Texture texture;
-        if (texture.loadFromFile(path))
-        {
-            entityTextures.push_back(texture);
-            entityNames.push_back(getFileNameWithoutExtension(path));
-            if (Map::entityTextures.find(getFileNameWithoutExtension(path)) == Map::entityTextures.end())
-            {
-                Map::entityTextures[getFileNameWithoutExtension(path)] = texture;
-            }
-        }
-    }
-}
-std::string Map::EntityMenu::getFileNameWithoutExtension(const std::string &path)
-{
-    size_t lastSlash = path.find_last_of("/\\");
-    size_t lastDot = path.find_last_of(".");
-    if (lastSlash == std::string::npos)
-        lastSlash = 0;
-    else
-        lastSlash++;
-    if (lastDot == std::string::npos || lastDot < lastSlash)
-        lastDot = path.length();
-    return path.substr(lastSlash, lastDot - lastSlash);
-}
-void Map::EntityMenu::draw()
-{
-    if (isOpen)
-    {
-        sf::View originalView = window.getView();
-        window.setView(window.getDefaultView());
 
-        for (size_t i = 0; i < entityTextures.size(); i++)
-        {
-            sf::Sprite sprite(entityTextures[i]);
-            sprite.setPosition(50.0f + i * 100.0f, 150.0f);
-            sprite.setScale(64.0f / entityTextures[i].getSize().x,
-                            64.0f / entityTextures[i].getSize().y);
-            window.draw(sprite);
-
-            if (i == selectedIndex)
-            {
-                sf::RectangleShape highlight;
-                highlight.setSize(sf::Vector2f(64, 64));
-                highlight.setPosition(sprite.getPosition());
-                highlight.setFillColor(sf::Color::Transparent);
-                highlight.setOutlineColor(sf::Color::Yellow);
-                highlight.setOutlineThickness(2.0f);
-                window.draw(highlight);
-            }
-        }
-
-        window.setView(originalView);
-    }
-}
-
-void Map::EntityMenu::selectNext()
-{
-    selectedIndex = (selectedIndex + 1) % entityNames.size();
-}
-
-void Map::EntityMenu::selectPrevious()
-{
-    selectedIndex = (selectedIndex - 1 + entityNames.size()) % entityNames.size();
-}
-
-void Map::drawEntityMenu()
-{
-    entityMenu.draw();
-}
-
-bool Map::handleEntityMenuClick(const sf::Vector2i &mousePosition)
-{
-    if (!entityMenu.isOpen)
-        return false;
-
-    for (size_t i = 0; i < entityMenu.entityTextures.size(); ++i)
-    {
-        sf::FloatRect spriteBounds(50.0f + i * 100.0f, 150.0f, 64, 64);
-        if (spriteBounds.contains(mousePosition.x, mousePosition.y))
-        {
-            entityMenu.selectedIndex = i;
-            return true;
-        }
-    }
-    return false;
-}
-
-void Map::toggleEntityMenu()
-{
-    entityMenu.isOpen = !entityMenu.isOpen;
-}
-const std::string &Map::getSelectedEntityName() const
-{
-    return entityMenu.entityNames[entityMenu.selectedIndex];
-}
-void Map::selectNextEntity()
-{
-    entityMenu.selectNext();
-}
-
-void Map::selectPreviousEntity()
-{
-    entityMenu.selectPrevious();
-}
-
-int Map::getSelectedEntityIndex() const
-{
-    return entityMenu.selectedIndex;
-}
-
-bool Map::isEntityMenuOpen() const
-{
-    return entityMenu.isOpen;
-}
 std::vector<sf::FloatRect> Map::getEntityBounds()
 {
     std::vector<sf::FloatRect> bounds;
@@ -205,68 +87,6 @@ void Map::drawEditorEntities(sf::RenderWindow &window, const PlacedEntity *selec
         window.draw(entitySprite);
     }
 }
-Map::TextureMenu::TextureMenu(const std::vector<std::string> &texturePaths, sf::RenderWindow &window)
-    : selectedIndex(0), window(window)
-{
-    for (const auto &path : texturePaths)
-    {
-        sf::Texture tex;
-        if (tex.loadFromFile(path))
-        {
-            textures.push_back(std::move(tex));
-            textureNames.push_back(getFileNameWithoutExtension(path));
-        }
-    }
-    if (!textures.empty())
-    {
-        selectedTexture.setTexture(textures[selectedIndex]);
-    }
-    // selectedTexture.setColor(sf::Color::Magenta);
-    // selectedTexture.setOutlineThickness(4.0f);
-}
-
-void Map::TextureMenu::draw()
-{
-    if (isOpen)
-    {
-        // Save the current view
-        sf::View originalView = window.getView();
-
-        // Reset the view to the default (window coordinates)
-        window.setView(window.getDefaultView());
-        for (size_t i = 0; i < textures.size(); i++)
-        {
-            sf::Sprite sprite(textures[i]);
-            sprite.setPosition(50.0f + i * 100.0f, 50.0f);
-            sprite.setScale(64.0f / sprite.getTexture()->getSize().x, 64.0f / sprite.getTexture()->getSize().y);
-            window.draw(sprite);
-
-            if (i == selectedIndex)
-            {
-                sf::RectangleShape highlight;
-                highlight.setSize(sf::Vector2f(64, 64));
-                highlight.setPosition(sprite.getPosition());
-                highlight.setFillColor(sf::Color::Transparent);
-                highlight.setOutlineColor(sf::Color::Magenta);
-                highlight.setOutlineThickness(4.0f);
-                window.draw(highlight);
-            }
-        }
-        // Restore the original view
-        window.setView(originalView);
-    }
-}
-void Map::TextureMenu::selectNext()
-{
-    selectedIndex = (selectedIndex + 1) % textures.size();
-    selectedTexture.setTexture(textures[selectedIndex]);
-}
-
-void Map::TextureMenu::selectPrevious()
-{
-    selectedIndex = (selectedIndex - 1 + textures.size()) % textures.size();
-    selectedTexture.setTexture(textures[selectedIndex]);
-}
 
 Map::Object::Object(int x, int y, int w, int h, std::string tname) : rect(sf::Vector2f(w, h))
 {
@@ -281,78 +101,39 @@ Map::Object::Object(int x, int y, int w, int h, std::string tname) : rect(sf::Ve
     size_t lastSlash = tname.find_last_of("/\\");
     size_t lastDot = tname.find_last_of(".");
     if (lastSlash == std::string::npos)
+    {
         lastSlash = 0;
+    }
     else
+    {
         lastSlash++;
+    }
     if (lastDot == std::string::npos || lastDot < lastSlash)
+    {
         lastDot = tname.length();
+    }
     this->texid = tname.substr(lastSlash, lastDot - lastSlash);
 }
-const sf::Texture *Map::getSelectedTexture() const
-{
-    return textureMenu.selectedTexture.getTexture();
-}
-bool Map::handleTextureMenuClick(const sf::Vector2i &mousePosition)
-{
-    if (!textureMenu.isOpen)
-        return false;
 
-    for (size_t i = 0; i < textureMenu.textures.size(); ++i)
-    {
-        sf::FloatRect textureBounds(50.0f + i * 100.0f, 50.0f, 64.0f, 64.0f); // Adjust size as needed
-        if (textureBounds.contains(mousePosition.x, mousePosition.y))
-        {
-            textureMenu.selectedIndex = i;
-            textureMenu.selectedTexture.setTexture(textureMenu.textures[i]);
-            return true;
-        }
-    }
-    return false;
-}
-bool Map::isTextureMenuOpen() const
-{
-    return textureMenu.isOpen;
-}
 void Map::Object::draw(sf::RenderWindow &window)
 {
     window.draw(rect);
 }
-void Map::drawTextureMenu()
-{
-    textureMenu.draw();
-}
 
-void Map::toggleTextureMenu()
-{
-    textureMenu.isOpen = !textureMenu.isOpen;
-}
-
-void Map::selectNextTexture()
-{
-    textureMenu.selectNext();
-}
-
-void Map::selectPreviousTexture()
-{
-    textureMenu.selectPrevious();
-}
-
-int Map::getSelectedTextureIndex() const
-{
-    return textureMenu.selectedIndex;
-}
 Map::Map(sf::RenderWindow &wndref, bool &gameover)
     : mx(0), my(0), np(1), wndref(wndref), gameOver(&gameover),
-      textureMenu({"../imgs/wow.png", "../imgs/woow.png", "../imgs/wooow.png", "../imgs/woooow.png"}, wndref),
-      entityMenu({"../imgs/player.png", "../imgs/pacman.png", "../imgs/capybaraa.png", "../imgs/arrow.png", "../imgs/pengu.png"}, wndref)
+      menu({"../imgs/player.png", "../imgs/pacman.png", "../imgs/capybaraa.png", "../imgs/arrow.png", "../imgs/pengu.png"},
+           {"../imgs/wow.png", "../imgs/woow.png", "../imgs/wooow.png", "../imgs/woooow.png"},
+           wndref)
 {
     this->view.setSize(wndref.getSize().x, wndref.getSize().y);
 }
 
 Map::Map(std::string fname, sf::RenderWindow &wndref, bool &gameover)
     : mx(0), my(0), np(1), wndref(wndref), gameOver(&gameover),
-      textureMenu({"../imgs/wow.png", "../imgs/woow.png", "../imgs/wooow.png", "../imgs/woooow.png"}, wndref),
-      entityMenu({"../imgs/player.png", "../imgs/pacman.png", "../imgs/arrow.png", "../imgs/capybaraa.png", "../imgs/pengu.png"}, wndref)
+      menu({"../imgs/player.png", "../imgs/pacman.png", "../imgs/capybaraa.png", "../imgs/arrow.png", "../imgs/pengu.png"},
+           {"../imgs/wow.png", "../imgs/woow.png", "../imgs/wooow.png", "../imgs/woooow.png"},
+           wndref)
 {
     this->view.setSize(wndref.getSize().x, wndref.getSize().y);
     if (std::filesystem::exists(fname))
@@ -443,10 +224,27 @@ void Map::draw()
         obj[mx][my][i]->draw(this->wndref);
     }
 }
-
+const std::string &Map::getSelectedName() const
+{
+    if (menu.isEntitySelected())
+    {
+        return menu.entityNames[menu.selectedIndex];
+    }
+    else
+    {
+        return menu.textureNames[menu.selectedIndex - menu.entityTextures.size()];
+    }
+}
 void Map::addObject(int x, int y, int w, int h)
 {
-    std::string textureName = textureMenu.textureNames[textureMenu.selectedIndex];
+    if (menu.isEntitySelected())
+    {
+        // If an entity is selected, we don't add an object
+        std::cout << "\nCannot add object when an entity is selected.";
+        return;
+    }
+
+    const std::string &textureName = menu.getSelectedName();
     int wx = this->wndref.getSize().x, wy = this->wndref.getSize().y;
     std::cout << "\n"
               << x + wx * mx << " " << y + wy * my << " " << textureName;
@@ -612,7 +410,6 @@ void Map::spawnEntities(sf::FloatRect &playerBounds)
             {
                 entity->setProperty(prop.first, prop.second);
             }
-
             activeEntities.push_back(entity.release()); // Transfer ownership to activeEntities
         }
     }
@@ -651,7 +448,10 @@ void Map::removeDeadEntities()
 void Map::PropertyEditor::applyChanges()
 {
     if (!selectedEntity)
+    {
         return;
+    }
+    std::cout << "\nsaved some changed things";
     auto properties = selectedEntity->entity->getEditableProperties();
     for (size_t i = 0; i < properties.size() && i < inputTexts.size(); ++i)
     {
@@ -714,7 +514,7 @@ void Map::PropertyEditor::updateForEntity(Map::PlacedEntity *entity, sf::Font &f
     inputBoxes.clear();
     inputTexts.clear();
     selectedInputBox = -1;
-
+    // std::cout<<"ffffff";
     if (!entity)
         return;
 
@@ -725,6 +525,7 @@ void Map::PropertyEditor::updateForEntity(Map::PlacedEntity *entity, sf::Font &f
         sf::Text label(prop.first + ":", font, 14);
         label.setPosition(834, yOffset);
         labels.push_back(label);
+        std::cout << (std::string)label.getString();
 
         sf::Text inputText(prop.second, font, 14);
         inputText.setPosition(838, yOffset + 22);
@@ -834,4 +635,109 @@ void Map::PropertyEditor::adjustBackgroundSize()
 
     float lastBoxBottom = inputBoxes.back().getPosition().y + inputBoxes.back().getSize().y;
     background.setSize(sf::Vector2f(200, lastBoxBottom + 20)); // Add some padding at the bottom
+}
+Map::Menu::Menu(const std::vector<std::string> &entityPaths, const std::vector<std::string> &texturePaths, sf::RenderWindow &window)
+    : selectedIndex(0), window(window)
+{
+    for (const auto &path : entityPaths)
+    {
+        sf::Texture texture;
+        if (texture.loadFromFile(path))
+        {
+            entityTextures.push_back(texture);
+            entityNames.push_back(getFileNameWithoutExtension(path));
+            if (Map::entityTextures.find(getFileNameWithoutExtension(path)) == Map::entityTextures.end())
+            {
+                Map::entityTextures[getFileNameWithoutExtension(path)] = texture;
+            }
+        }
+    }
+
+    for (const auto &path : texturePaths)
+    {
+        sf::Texture tex;
+        if (tex.loadFromFile(path))
+        {
+            textures.push_back(std::move(tex));
+            textureNames.push_back(getFileNameWithoutExtension(path));
+        }
+    }
+}
+
+void Map::Menu::draw()
+{
+    if (isOpen)
+    {
+        sf::View originalView = window.getView();
+        window.setView(window.getDefaultView());
+
+        size_t totalItems = entityTextures.size() + textures.size();
+        for (size_t i = 0; i < totalItems; i++)
+        {
+            sf::Sprite sprite;
+            if (i < entityTextures.size())
+            {
+                sprite.setTexture(entityTextures[i]);
+            }
+            else
+            {
+                sprite.setTexture(textures[i - entityTextures.size()]);
+            }
+            sprite.setPosition(50.0f + i * 100.0f, 50.0f);
+            sprite.setScale(64.0f / sprite.getTexture()->getSize().x, 64.0f / sprite.getTexture()->getSize().y);
+            window.draw(sprite);
+
+            if (i == selectedIndex)
+            {
+                sf::RectangleShape highlight;
+                highlight.setSize(sf::Vector2f(64, 64));
+                highlight.setPosition(sprite.getPosition());
+                highlight.setFillColor(sf::Color::Transparent);
+                highlight.setOutlineColor(sf::Color::Yellow);
+                highlight.setOutlineThickness(2.0f);
+                window.draw(highlight);
+            }
+        }
+
+        window.setView(originalView);
+    }
+}
+
+void Map::Menu::selectNext()
+{
+    selectedIndex = (selectedIndex + 1) % (entityTextures.size() + textures.size());
+}
+
+void Map::Menu::selectPrevious()
+{
+    selectedIndex = (selectedIndex - 1 + entityTextures.size() + textures.size()) % (entityTextures.size() + textures.size());
+}
+
+bool Map::handleMenuClick(const sf::Vector2i &mousePosition)
+{
+    if (!menu.isOpen)
+        return false;
+
+    for (size_t i = 0; i < menu.entityTextures.size() + menu.textures.size(); ++i)
+    {
+        sf::FloatRect itemBounds(50.0f + i * 100.0f, 50.0f, 64.0f, 64.0f);
+        if (itemBounds.contains(mousePosition.x, mousePosition.y))
+        {
+            menu.selectedIndex = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+const sf::Texture *Map::getSelectedTexture() const
+{
+    if (menu.isEntitySelected())
+    {
+        return &menu.entityTextures[menu.selectedIndex];
+    }
+    else
+    {
+        return &menu.textures[menu.selectedIndex - menu.entityTextures.size()];
+    }
 }

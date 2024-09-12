@@ -1,5 +1,5 @@
 #pragma once
-class Idk : public Entity {
+class Idk :public Animation, public CollisionDetector {
 public:
     Idk(sf::Vector2f position, float moveDistance);
     void update(float deltaTime, Map& map, const sf::Vector2u& screenres) override;

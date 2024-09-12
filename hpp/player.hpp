@@ -2,7 +2,7 @@
 class Animation;
 class Item;
 
-class Player : public Entity {
+class Player : public Animation, public CollisionDetector {
     friend class Item;
 public:
     Player(sf::Vector2f position,bool&gameover);

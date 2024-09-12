@@ -16,15 +16,15 @@
 #include <fstream>
 #include <sstream>
 #include <random>
-#include "stb_image.hpp"
 #include "GifPlayer.hpp"
 #include "EntityFactory.hpp"
 #include "map.hpp"
 #include "CutScene.hpp"
+#include "Entity.hpp"
+#include "sprite.hpp"
 #include "Animation.hpp"
 #include "CollisionDetector.hpp"
 #include "TextBox.hpp"
-#include "Entity.hpp"
 #include "idk.hpp"
 #include "attack.hpp"
 #include "Boss.hpp"

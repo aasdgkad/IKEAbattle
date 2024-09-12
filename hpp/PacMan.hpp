@@ -3,7 +3,7 @@
 #include "Entity.hpp"
 #include "Map.hpp"
 
-class PacMan : public Entity {
+class PacMan : public Animation, public CollisionDetector {
 public:
     PacMan(sf::Vector2f spawnPosition, bool &gameOver);
     void update(float deltaTime, Map& map, const sf::Vector2u& screenres) override;

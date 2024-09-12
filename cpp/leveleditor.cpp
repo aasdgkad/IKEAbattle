@@ -39,7 +39,7 @@ int main()
     sf::Sprite entityPreview;        // This is the preview sprite for entities
     sf::Vector2i fc(0, 0), sc(0, 0); // Stands for first click, second click
     bool lc = false;                 // Stands for left click, used to determine if the left click is currently being pressed
-    bool placingTexture = true;      // True for texture, false for entity
+    bool placingTexture = false;      // True for texture, false for entity
 
     window.setView(view);
 
@@ -47,7 +47,7 @@ int main()
     transrect.setTexture(map.getSelectedTexture());
 
     // Initialize entity preview
-    const sf::Texture *initialEntityTexture = map.getEntityTexture(map.getSelectedEntityName());
+    const sf::Texture *initialEntityTexture = map.getEntityTexture(map.getSelectedName());
     updateEntityPreview(entityPreview, initialEntityTexture);
 
     Map::PropertyEditor propertyEditor;
@@ -72,24 +72,7 @@ int main()
             {
                 if (event.key.code == sf::Keyboard::E && !propertyEditor.isOpen)
                 {
-                    map.toggleTextureMenu();
-                    map.toggleEntityMenu();
-                }
-                else if (event.key.code == sf::Keyboard::Tab)
-                {
-                    placingTexture = !placingTexture;
-                    if (placingTexture)
-                    {
-                        transrect.setTexture(map.getSelectedTexture());
-                        transrect.setFillColor(sf::Color(255, 255, 255, 128));
-                    }
-                    else
-                    {
-                        transrect.setTexture(nullptr);
-                        transrect.setFillColor(sf::Color::Transparent);
-                        const sf::Texture *entityTexture = map.getEntityTexture(map.getSelectedEntityName());
-                        updateEntityPreview(entityPreview, entityTexture);
-                    }
+                    map.menu.isOpen = !map.menu.isOpen;
                 }
             }
             else if (event.type == sf::Event::MouseButtonPressed)
@@ -97,21 +80,24 @@ int main()
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
                     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                    if (map.handleTextureMenuClick(mousePos))
+                    if (map.handleMenuClick(mousePos))
                     {
-                        placingTexture = true;
-                        transrect.setTexture(map.getSelectedTexture());
-                        transrect.setFillColor(sf::Color(255, 255, 255, 128));
+                        if (map.menu.isEntitySelected())
+                        {
+                            placingTexture = false;
+                            transrect.setTexture(nullptr);
+                            transrect.setFillColor(sf::Color::Transparent);
+                            const sf::Texture *entityTexture = map.getSelectedTexture();
+                            updateEntityPreview(entityPreview, entityTexture);
+                        }
+                        else
+                        {
+                            placingTexture = true;
+                            transrect.setTexture(map.getSelectedTexture());
+                            transrect.setFillColor(sf::Color(255, 255, 255, 128));
+                        }
                     }
-                    else if (map.handleEntityMenuClick(mousePos))
-                    {
-                        placingTexture = false;
-                        transrect.setTexture(nullptr);
-                        transrect.setFillColor(sf::Color::Transparent);
-                        const sf::Texture *entityTexture = map.getEntityTexture(map.getSelectedEntityName());
-                        updateEntityPreview(entityPreview, entityTexture);
-                    }
-                    else if (!map.isTextureMenuOpen() && !map.isEntityMenuOpen() && !propertyEditor.isOpen)
+                    else if (!map.menu.isOpen && !propertyEditor.isOpen)
                     {
                         fc = mousePos;
                         lc = true;
@@ -127,8 +113,7 @@ int main()
                     {
                         if (placedEntity->sprite.getGlobalBounds().contains(worldPos))
                         {
-                            map.textureMenu.isOpen=false;
-                            map.entityMenu.isOpen=false;
+                            map.menu.isOpen = false;
                             clickedEntity = placedEntity.get();
                             break;
                         }
@@ -137,7 +122,7 @@ int main()
                     propertyEditor.updateForEntity(clickedEntity, font);
                 }
             }
-            else if (event.type == sf::Event::MouseButtonReleased && !map.isTextureMenuOpen() && !map.isEntityMenuOpen() && !propertyEditor.isOpen)
+            else if (event.type == sf::Event::MouseButtonReleased && !map.menu.isOpen && !propertyEditor.isOpen)
             {
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
@@ -151,7 +136,7 @@ int main()
                     {
                         sf::Vector2f entityPos = entityPreview.getPosition();
                         sf::Vector2f entitySize = sf::Vector2f(entityPreview.getGlobalBounds().width, entityPreview.getGlobalBounds().height);
-                        map.addEntity(entityPos.x - entitySize.x / 2, entityPos.y - entitySize.y / 2, map.getSelectedEntityName());
+                        map.addEntity(entityPos.x - entitySize.x / 2, entityPos.y - entitySize.y / 2, map.getSelectedName());
                     }
                     sc = sf::Vector2i(0, 0);
                     transrect.setSize(sf::Vector2f(0, 0));
@@ -181,6 +166,7 @@ int main()
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
             {
                 map.saveToFile("../map.mib");
+                std::cout << "\nsaved map";
                 while (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
                 {
                 } // Wait for key release
@@ -257,14 +243,13 @@ int main()
         // Drawing
         window.clear();
         map.draw();
-        map.drawEditorEntities(window,propertyEditor.selectedEntity , propertyEditor.isOpen);
+        map.drawEditorEntities(window, propertyEditor.selectedEntity, propertyEditor.isOpen);
         window.draw(transrect);
-        if (!placingTexture && !map.isEntityMenuOpen() && !map.isTextureMenuOpen() && !propertyEditor.isOpen)
+        if (!placingTexture && !map.menu.isOpen && !propertyEditor.isOpen)
         {
             window.draw(entityPreview);
         }
-        map.drawTextureMenu();
-        map.drawEntityMenu();
+        map.menu.draw();
         propertyEditor.draw(window);
         window.display();
     }

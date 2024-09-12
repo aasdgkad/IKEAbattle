@@ -1,4 +1,3 @@
-// CutScene.hpp
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>

@@ -1,20 +1,26 @@
 #pragma once
 
-class Map;
+class Map; // Forward declaration
 
-class Penguin : public Entity {
+class Penguin : public Animation, public CollisionDetector {
 public:
     Penguin(sf::Vector2f position);
-    void update(float deltaTime, Map& map, const sf::Vector2u& screenres) override;
+    
+    void update(float deltaTime, Map &map, const sf::Vector2u& screenres) override;
     void draw(sf::RenderWindow& window) override;
-    std::vector<std::pair<std::string, std::string>> getEditableProperties() const override;
-    void setProperty(const std::string& name, const std::string& value) override;
+
+
+    // New methods specific to Penguin
+    void setSpeed(float newSpeed) { speed = newSpeed; }
+    float getSpeed() const { return speed; }
+
+    bool isMovingRight() const { return speed > 0; }
 
 private:
     void loadSprite();
     void manageCollisions(const std::vector<sf::FloatRect>& objectBounds);
+
     float gravity;
     bool isColliding;
-    bool isMovingRight;
     float speed;
 };

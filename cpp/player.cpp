@@ -1,7 +1,7 @@
 #include "../hpp/libs.hpp"
 #include <iostream>
 
-Player::Player(sf::Vector2f position,bool &gameoverr) : Entity(), gameover(&gameoverr)
+Player::Player(sf::Vector2f position,bool &gameoverr) : Animation(), CollisionDetector(), gameover(&gameoverr)
 {
        loadAnimations();
        loadShaders();
@@ -36,12 +36,12 @@ void Player::handleInput()
        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
        {
               velocity.x = -moveSpeed;
-              isFacingRight = false;
+              flipped = false;
        }
        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
        {
               velocity.x = moveSpeed;
-              isFacingRight = true;
+              flipped = true;
        }
        else
        {
@@ -98,7 +98,7 @@ void Player::update(float deltaTime, Map &map, const sf::Vector2u &screenres)
               manageCollisions(map.getObjectBounds());
               checkBounds(screenres, map);
               updateAnimation();
-              Animation::update(deltaTime);
+              Animation::update(deltaTime,map,screenres);
               place=getBounds();
        }
 }
@@ -115,7 +115,7 @@ void Player::draw(sf::RenderWindow &window)
 
 void Player::manageCollisions(const std::vector<sf::FloatRect> &objectBounds)
 {
-       sf::FloatRect playerBounds = getSprite().getGlobalBounds();
+       sf::FloatRect playerBounds = sprite.getGlobalBounds();
        isGrounded = false;
 
        for (const auto &obstacle : objectBounds)
